@@ -1,5 +1,17 @@
-# Simple IS test
 #
+# for DTU course 02211
+#
+# Project by:
+# Harri Antero Laine: s131196
+# Istvan Szonyi: s131153
+# Komlan Tom Evon: s072728
+#
+#
+# Example file
+# Simple IS tests
+#
+
+
 addi r01,r00,2
 #r00 = 0, r01 = 2
 add r02,r01,r01
