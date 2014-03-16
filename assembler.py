@@ -1,4 +1,15 @@
+#
+#
+# Programmed for Python 2.7.X
 # Simple assembler for DTU course 02211
+#
+#
+# Project by:
+# Harri Antero Laine: s131196
+# Istvan Szonyi: s131153
+# Komlan Tom Evon: s072728
+#
+#
 
 import re
 
@@ -110,34 +121,51 @@ def parse_jmp(line):
         binary = op_binary + dst_binary
     return binary
 
+#Check line operation type
 def check_line(line):
     reg_types=["add", "sub", "mult", "div", "and", "or", "slt", "srl", "slr"]
     imm_types=["addi", "beq", "lb", "sb"]
     jmp_types=["jmp"]
 
+    #Commented lines start with #
     if re.match("#", line):
         return False
     else:
+        #Registry-type ops
         for reg in reg_types:
             if re.search(reg+"\s", line):
                 binary = parse_reg(line)
+        #Immediate-type ops
         for imm in imm_types:
             if re.search(imm+"\s", line):
                 binary = parse_imm(line)
+        #Jump-type ops
         for jmp in jmp_types:
             if re.search(jmp+"\s", line):
                 binary = parse_jmp(line)
+        #Check if binary is defined
         try:
             return binary
         except UnboundLocalError:
             return False
 
-
+#Main program
+print "Running..."
+#Read input file
 with open('IS.asm') as input_file:
+    #Open output file
     output = open('output.bin', 'wb')
+    #Read file line by line
     for line in input_file:
+        #Strip empty characters from left and right
         binary = check_line(line.rstrip().lstrip())
+        #If there is no errors parsing code, output it
         if binary != False:
+            #Print output
             print binary
+            #Write output to file
             output.write(binary)
+    #Close output file
     output.close()
+#Program finished
+print "Finished"
