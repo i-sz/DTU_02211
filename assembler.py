@@ -16,32 +16,41 @@ import re
 def convert_regs(regs):
     binary = ""
     for reg in regs:
-        if re.search("r00", reg):
-            binary = binary + "00000"
-        elif re.search("r01", reg):
-            binary = binary + "00001"
-        elif re.search("r02", reg):
-            binary = binary + "00010"
-        elif re.search("r03", reg):
-            binary = binary + "00011"
-        elif re.search("r04", reg):
-            binary = binary + "00100"
-        elif re.search("r05", reg):
-            binary = binary + "00101"
-        elif re.search("r06", reg):
-            binary = binary + "00110"
-        elif re.search("r07", reg):
-            binary = binary + "00111"
+        m = re.search("r([0-9]*)", reg)
+        if m:
+            # 5-bit regs, between 0 and 2^5
+            if int(m.group(1)) >= 0 and int(m.group(1)) < pow(2,5):
+                binary = binary + '{0:05b}'.format(int(m.group(1)))
+            else:
+                return False
         else:
             return False
     return binary
 
 def convert_imm(imm):
-    binary = '{0:016b}'.format(int(imm))
+    imm = int(imm)
+    if imm < 0:
+        binary = "1"
+    else:
+        binary = "0"
+    if imm > -pow(2,15) and imm < pow(2,15):
+        binary = binary + '{0:015b}'.format(abs(imm))
+    else:
+        return False
+    # print binary
     return binary
 
 def convert_dst(dst):
-    binary = '{0:026b}'.format(int(dst))
+    dst = int(dst)
+    if dst < 0:
+        binary = "1"
+    else:
+        binary = "0"
+    if dst > -pow(2,25) and dst < pow(2,25):
+        binary = binary + '{0:025b}'.format(abs(dst))
+    else:
+        return False
+    # print binary
     return binary
     
 
@@ -73,7 +82,7 @@ def parse_reg(line):
         funct_binary = False
     reg_binary = convert_regs(regs)
     if reg_binary == False or funct_binary == False:
-        binary = False
+        return False
     else:
         binary = op_binary + reg_binary + shift_binary + funct_binary
     return binary
@@ -99,7 +108,7 @@ def parse_imm(line):
     reg_binary = convert_regs(regs)
     imm_binary = convert_imm(imm)
     if reg_binary == False or imm_binary == False or op_binary == False:
-        binary = False
+        return False
     else:
         binary = op_binary + reg_binary + imm_binary
     return binary
@@ -110,12 +119,12 @@ def parse_jmp(line):
     parts = line.split(" ")
     op = parts[0]
     dst = parts[1]
-    if re.search("jmp\s", op):
+    if re.search("jmp", op):
         op_binary = "001000"
     else:
         op_binary = False
     dst_binary = convert_dst(dst)
-    if op_binary == False:
+    if op_binary == False or dst_binary == False:
         binary = False
     else:
         binary = op_binary + dst_binary
@@ -145,6 +154,8 @@ def check_line(line):
                 binary = parse_jmp(line)
         #Check if binary is defined
         try:
+            if binary == False:
+                raise NameError('Something wrong with line ' + line)
             return binary
         except UnboundLocalError:
             return False

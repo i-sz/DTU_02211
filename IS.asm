@@ -28,9 +28,17 @@ or r07,r01,r02
 
 slt r03,r02,r01
 
-beq r01,r02,1
+addi r01,r00,0
 
-jmp 10
+addi r02,r00,1
+
+beq r01,r02,3
+
+addi r01,r01,1
+
+jmp -2
+
+addi r01,r01,-1
 
 sb r04,r00,255
 
