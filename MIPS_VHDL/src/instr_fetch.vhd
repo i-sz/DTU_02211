@@ -4,7 +4,7 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY  instr_fecth is
-GENERIC (MIPS_SIZE: NATURAL, PC_incr: NATURAL := 4 );
+GENERIC (MIPS_SIZE: NATURAL; PC_incr: NATURAL := 4 );
 port(
 	clk	: in std_logic;
 	rst : in std_logic;
@@ -29,9 +29,7 @@ ARCHITECTURE behaviour OF instr_fecth IS
 
     component Instr_Memory
 	    GENERIC (N:     NATURAL := MIPS_SIZE); -- Width of inputs.
-        port (
-		    rd      : in std_logic;
-            address : in std_logic_vector(N-1 downto 0);			
+        port ( address : in std_logic_vector(N-1 downto 0);			
 			data    : inout std_logic_vector(N-1 downto 0));
 	END component;
 
@@ -61,35 +59,35 @@ ARCHITECTURE behaviour OF instr_fecth IS
 		  instr_reg_out     : OUT	std_logic_vector(N-1 DOWNTO 0));
     END component;
 	
-	SIGNAL PC_tmp1, PC_tmp3,Instr_tmp: std_logic_vector(MIPS_SIZE-1 DOWNTO 0);
-	SIGNAL PC_tmp2: std_logic_vector(MIPS_SIZE DOWNTO 0);
+	SIGNAL PC_tmp1, PC_tmp3,Instr_tmp : std_logic_vector(MIPS_SIZE-1 DOWNTO 0);
+	SIGNAL PC_tmp2 : std_logic_vector(MIPS_SIZE DOWNTO 0);
 
 BEGIN
      PC: reg
-		GENERIC (N: NATURAL := MIPS_SIZE); -- Width of inputs.
-		PORT Map(Ain  => PC_tmp1,
+		GENERIC Map (N => MIPS_SIZE) -- Width of inputs.
+		PORT Map (Ain  => PC_tmp1,
 			clk   => clk,
 			rst   => rst,
 			reg_out  => PC_tmp3 
 		);
 
      PCadder: adder
-		GENERIC (N:     NATURAL := MIPS_SIZE);
+		GENERIC Map (N => MIPS_SIZE)
 		PORT Map (adderin1 => PC_tmp1,
-			adderin2 => PC_incr,
+			adderin2 => std_logic_vector(to_unsigned(PC_incr,MIPS_SIZE)),
 			Cin => '0',
 	        Cout => PC_tmp2(MIPS_SIZE),
 			adderout =>PC_tmp2(MIPS_SIZE-1 downto 0) 
 	    );
 
      Instr_Memory1 :Instr_Memory
-        GENERIC (N:     NATURAL := MIPS_SIZE);	 
+        GENERIC Map(N => MIPS_SIZE)	 
         port Map ( address => PC_tmp1,
 			data => Instr_tmp 
 		);
 		
      PC_Mux: mux2  -- two-input multiplexer
-		generic(N: NATURAL:= MIPS_SIZE);
+		generic Map(N => MIPS_SIZE)
 		port map (in0 => PC_tmp2(MIPS_SIZE-1 downto 0), 
 		     in1 => pc_addr_in,
 			 sel => pc_sel,
@@ -97,13 +95,13 @@ BEGIN
 		);
 		
 	 fetch_decode_regs: ifetch_idecode_regs
-		GENERIC (N:     NATURAL:= MIPS_SIZE);  -- Width of inputs.
+		GENERIC Map (N => MIPS_SIZE)  -- Width of inputs.
 		PORT Map (clk  => clk,
 			  rst   => rst,
 			  pc_addr_in => PC_tmp2(MIPS_SIZE-1 downto 0),
 			  instr_reg_in => Instr_tmp,
 			  pc_addr_out => pc_addr_out,
-			  instr_reg_out   => instr_reg_out  
+			  instr_reg_out   => instr  
 		);
 
 END behaviour;
