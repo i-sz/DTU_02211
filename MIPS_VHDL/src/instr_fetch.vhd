@@ -4,6 +4,7 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY  instr_fecth is
+GENERIC (MIPS_SIZE: NATURAL, PC_incr: NATURAL := 4 );
 port(
 	clk	: in std_logic;
 	rst : in std_logic;
@@ -12,32 +13,97 @@ port(
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	instr : out std_logic_vector(MIPS_SIZE-1 downto 0) 
 );
-END ifetch;
+END instr_fecth;
 
-ARCHITECTURE behaviour OF ifetch IS
+ARCHITECTURE behaviour OF instr_fecth IS
 
 	component adder                                
-		GENERIC (N:     NATURAL := 8); -- Width of inputs.
+		GENERIC (N:     NATURAL := MIPS_SIZE); -- Width of inputs.
 		PORT (
-			adderin1:  IN  std_logic_vector(N DOWNTO 1);   -- Input.
-			adderin2:  IN  std_logic_vector(N DOWNTO 1);   -- Input.
+			adderin1:  IN  std_logic_vector(N-1 DOWNTO 0);   -- Input.
+			adderin2:  IN  std_logic_vector(N-1 DOWNTO 0);   -- Input.
 			Cin:       IN  STD_LOGIC;
 	        Cout:      OUT STD_LOGIC;
-			adderout:  OUT std_logic_vector(10 DOWNTO 1));-- Output.
+			adderout:  OUT std_logic_vector(N-1 DOWNTO 0));-- Output.
 	END component;
 
-    component Instr_Memory                                
-        port (rst : in std_logic;
+    component Instr_Memory
+	    GENERIC (N:     NATURAL := MIPS_SIZE); -- Width of inputs.
+        port (
 		    rd      : in std_logic;
-            address : in std_logic_vector(4 downto 0);			
-			data    : inout std_logic_vector(7 downto 0)  );
+            address : in std_logic_vector(N-1 downto 0);			
+			data    : inout std_logic_vector(N-1 downto 0));
 	END component;
 
+	component reg
+		GENERIC (N:     NATURAL := MIPS_SIZE);                     -- Width of inputs.
+		PORT(
+			 Ain     : IN  std_logic_vector(N-1 DOWNTO 0);
+			 clk     : IN  std_logic;
+			 rst   : IN  std_logic;
+			 reg_out : OUT	std_logic_vector(N-1 DOWNTO 0));
+	END component;
+	
+	component mux2  -- two-input multiplexer
+		generic(N: NATURAL:= MIPS_SIZE);
+		port(in0, in1: in  STD_LOGIC_VECTOR(N-1 downto 0);
+			 sel:      in  STD_LOGIC;
+			 y:        out STD_LOGIC_VECTOR(N-1 downto 0));
+	end component;
+	
+	component ifetch_idecode_regs
+		GENERIC (N:     NATURAL);  -- Width of inputs.
+		PORT(clk     : IN  std_logic;
+		  rst  : IN std_logic;
+		  pc_addr_in	    : IN	std_logic_vector(N-1 downto 0);
+		  instr_reg_in	    : IN	std_logic_vector(N-1 downto 0);	
+		  pc_addr_out       : OUT	std_logic_vector(N-1 downto 0);
+		  instr_reg_out     : OUT	std_logic_vector(N-1 DOWNTO 0));
+    END component;
+	
+	SIGNAL PC_tmp1, PC_tmp3,Instr_tmp: std_logic_vector(MIPS_SIZE-1 DOWNTO 0);
+	SIGNAL PC_tmp2: std_logic_vector(MIPS_SIZE DOWNTO 0);
 
-
-
-	SIGNAL tmp_1, tmp_2, tmp_3: std_logic_vector(10 DOWNTO 1) := "0000000000";
 BEGIN
+     PC: reg
+		GENERIC (N: NATURAL := MIPS_SIZE); -- Width of inputs.
+		PORT Map(Ain  => PC_tmp1,
+			clk   => clk,
+			rst   => rst,
+			reg_out  => PC_tmp3 
+		);
 
-    adderout <= std_logic_vector((unsigned(adderin1) + unsigned(adderin2)));
+     PCadder: adder
+		GENERIC (N:     NATURAL := MIPS_SIZE);
+		PORT Map (adderin1 => PC_tmp1,
+			adderin2 => PC_incr,
+			Cin => '0',
+	        Cout => PC_tmp2(MIPS_SIZE),
+			adderout =>PC_tmp2(MIPS_SIZE-1 downto 0) 
+	    );
+
+     Instr_Memory1 :Instr_Memory
+        GENERIC (N:     NATURAL := MIPS_SIZE);	 
+        port Map ( address => PC_tmp1,
+			data => Instr_tmp 
+		);
+		
+     PC_Mux: mux2  -- two-input multiplexer
+		generic(N: NATURAL:= MIPS_SIZE);
+		port map (in0 => PC_tmp2(MIPS_SIZE-1 downto 0), 
+		     in1 => pc_addr_in,
+			 sel => pc_sel,
+			 y  => PC_tmp3
+		);
+		
+	 fetch_decode_regs: ifetch_idecode_regs
+		GENERIC (N:     NATURAL:= MIPS_SIZE);  -- Width of inputs.
+		PORT Map (clk  => clk,
+			  rst   => rst,
+			  pc_addr_in => PC_tmp2(MIPS_SIZE-1 downto 0),
+			  instr_reg_in => Instr_tmp,
+			  pc_addr_out => pc_addr_out,
+			  instr_reg_out   => instr_reg_out  
+		);
+
 END behaviour;
