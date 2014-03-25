@@ -36,7 +36,7 @@ ARCHITECTURE behaviour OF ifetch IS
 
 
 
-	SIGNAL tmp_9_1, tmp_9_2, tmp_9_3: std_logic_vector(10 DOWNTO 1) := "0000000000";
+	SIGNAL tmp_1, tmp_2, tmp_3: std_logic_vector(10 DOWNTO 1) := "0000000000";
 BEGIN
 
     adderout <= std_logic_vector((unsigned(adderin1) + unsigned(adderin2)));
