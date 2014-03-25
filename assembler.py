@@ -10,6 +10,9 @@
 # Komlan Tom Evon: s072728
 #
 #
+# Instruction set:
+# https://en.wikiversity.org/wiki/Computer_Architecture_Lab/SS2014/group_5_lab_2
+#
 
 import re
 
@@ -96,13 +99,13 @@ def parse_imm(line):
     regs = [regs_imm[0], regs_imm[1]]
     imm = regs_imm[2]
     if re.search("addi", op):
-        op_binary = "001000"
+        op_binary = "100001"
     elif re.search("beq", op):
-        op_binary = "000100"
+        op_binary = "000010"
     elif re.search("lb", op):
         op_binary = "100000"
     elif re.search("sb", op):
-        op_binary = "101000"
+        op_binary = "110000"
     else:
         op_binary = False
     reg_binary = convert_regs(regs)
@@ -120,7 +123,7 @@ def parse_jmp(line):
     op = parts[0]
     dst = parts[1]
     if re.search("jmp", op):
-        op_binary = "001000"
+        op_binary = "0000001"
     else:
         op_binary = False
     dst_binary = convert_dst(dst)
