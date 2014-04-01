@@ -13,6 +13,7 @@ use IEEE.STD_LOGIC_ARITH.all;
 entity instr_decode is
 	port(
 		clk : in std_logic;
+		rst : in std_logic;
 		instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		reg_1 : out std_logic_vector(4 downto 0);
 		reg_2 : out std_logic_vector(4 downto 0);
@@ -34,16 +35,39 @@ architecture behavior of instr_decode is
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(7 downto 0);
 	
+component register_file is
+	port(
+		clk : in std_logic;
+		rst : in std_logic;
+		rw	: in std_logic;
+		r1_addr	: in std_logic_vector(7 downto 0);
+		r2_addr	: in std_logic_vector(7 downto 0);
+		r3_addr	: in std_logic_vector(7 downto 0);
+		wr_data : in std_logic_vector(31 downto 0);
+		--signals from WB stage
+		rw : in std_logic;
+		wr_data : in std_logic_vector(31 downto 0);
+		--
+		
+		reg_2 : out std_logic_vector(31 downto 0);
+		reg_3 : out std_logic_vector(31 downto 0)
+	);
+end component;	
+	
 begin
-	rf : entity register_file port map(
-		clk,
-		rst,
-		reg_1_p,
-		reg_wr_data,
-		reg_2_p,
-		reg_2_val,
-		reg_3_p,
-		reg_3_val
+
+register_file_i : register_file 
+port map(
+		clk => clk,
+		rst => rst,
+		rw  => rw,
+		r1_addr	=> reg_1_p,
+		r2_addr	=> reg_2_p,
+		r3_addr	=> reg_3_p
+		wr_data => wr_data,
+		reg_2 => reg_2, 
+		reg_3 => reg_3
+
 	);
 	
 	
