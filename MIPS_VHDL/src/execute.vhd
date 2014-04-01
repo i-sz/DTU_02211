@@ -1,5 +1,4 @@
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;		
 use IEEE.numeric_std.all;
@@ -22,7 +21,7 @@ port(
 	jump_instr : in std_logic;
 	jump_addr : out std_logic;
 
-	branch_out : out std_logic_vector(7 downto 0);
+	branch_out : out std_logic_vector(7 downto 0)
 	
 );
 
@@ -32,7 +31,18 @@ end execute;
 architecture behaviour of execute is
 
 signal input_a, input_b, alu_output : std_logic_vector(7 downto 0);
-signal alu_ctrl : std_logic_vector(2 downto 0);
+signal alu_ctrl : std_logic_vector(2 downto 0); 
+
+
+--signals for the pipeline stage
+
+alu_result_p : std_logic_vector(7 downto 0);
+ctrl_p : std_logic_vector(2 downto 0);
+jump_addr_p : std_logic;
+branch_out_p : std_logic_vector(7 downto 0)
+
+
+
 
 component alu is
 port(
@@ -53,7 +63,7 @@ port map(
 	input_a <= input_a,
 	input_b <= input_b,
 	ctrl <= alu_ctrl,
-	output <= alu_rezult
+	output <= alu_result
 );	
 
 
@@ -69,7 +79,27 @@ branch_out <= branch_add (7 DOWNTO 0);
 jump_add <= jump_instr (7 DOWNTO 0);
 jump_address <= jump_add;
 
+
+--pipeline stage
+process(clk,rst)
+begin
+	if  rst='1' then
+		alu_result <= (others => '0');
+		ctrl <= '0';
+		jump_addr <= (others => '0');
+		branch_out <= (others => '0');
+
+	elsif rising_edge(CLK) then 
+		alu_result <= alu_result_p;
+		ctrl <= ctrl_p;
+		jump_addr <= jump_addr_p;
+		branch_out <= branch_out_p;
+	end if;
+end process;	  
+		
+
 end behaviour;
+
 
 
 
