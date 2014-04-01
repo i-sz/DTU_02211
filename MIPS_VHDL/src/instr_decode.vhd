@@ -14,49 +14,64 @@ entity instr_decode is
 	port(
 		clk : in std_logic;
 		instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_read_2 : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_read_3 : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		write_reg_addr : out std_logic_vector(4 downto 0);
+		reg_1 : out std_logic_vector(4 downto 0);
+		reg_2 : out std_logic_vector(4 downto 0);
+		reg_3 : out std_logic_vector(4 downto 0);
+		imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		jmp_addr : out std_logic_vector(25 downto 0);
 		pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		sign_extend = out std_logic_vector(7 downto 0);
-		-- alu_ctrl = 010 -> ADD, 110 -> SUB, 000 -> AND, 001 -> OR, 111 -> SLT, 100 -> MULT, 011 -> DIV
+		-- alu_ctrl = 010 -> ADD, 110 -> SUB, 000 -> AND, 001 -> OR, 111 -> SLT, 100 -> MULT, 011 -> DIV, 101 -> SHIFT
 		alu_ctrl : out std_logic_vector(2 downto 0);
 	)
 end instr_decode;
 
 architecture behavior of instr_decode is
-	signal reg_2_p, reg_3_p : std_logic_vector(MIPS_SIZE-1 downto 0);
-	signal write_reg_addr_p : std_logic_vector(4 downto 0);
+	signal reg_1_p, reg_2_p, reg_3_p : std_logic_vector(4 downto 0);
+	signal imm_p : std_logic_vector(MIPS_SIZE-1 downto 0);
 	signal jmp_addr_p : std_logic_vector(25 downto 0);
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(7 downto 0);
 	
 begin
+	rf : entity register_file port map(
+		clk,
+		rst,
+		reg_1_p,
+		reg_wr_data,
+		reg_2_p,
+		reg_2_val,
+		reg_3_p,
+		reg_3_val
+	);
+	
+	
 	case instr(31 downto 26) is
 		when "000000" => --register functions
 			-- read register 2 and 3 and get register write address
-			write_reg_addr <= instr(25 downto 21);
-			reg_2_p <= register_data(instr(20 downto 16)); --from r2
-			reg_3_p <= register_data(instr(15 downto 11)); --from r3
+			reg_1_p <= instr(25 downto 21); --from r1
+			reg_2_p <= instr(20 downto 16); --from r2
+			reg_3_p <= instr(15 downto 11); --from r3
 			case instr(5 downto 0) is
 				when "100000" => --add
-					alu_ctrl_p <= "010"
+					alu_ctrl_p <= "010";
 				when "100010" => --sub
-					alu_ctrl_p <= "110"
+					alu_ctrl_p <= "110";
 				when "100100" => --mult
-					alu_ctrl_p <= "100"
+					alu_ctrl_p <= "100";
 				when "100101" => --div
-					alu_ctrl_p <= "011"
+					alu_ctrl_p <= "011";
 				when "101000" => --and
-					alu_ctrl_p <= "001"
+					alu_ctrl_p <= "001";
 				when "101001" => --or
-					alu_ctrl_p <= "111"
+					alu_ctrl_p <= "111";
 				when "110100" => --slt
-					alu_ctrl_p <= "100"
+					alu_ctrl_p <= "100";
 				when "111000" => --srl
+					alu_ctrl_p <= "101";
 				when "111001" => --slr
+					alu_ctrl_p <= "101";
 				when others =>
 			end case;
 		when "000001" => --jmp
@@ -69,11 +84,12 @@ begin
 			end case;
 		when others => --immediate and rest
 			case instr(31 downto 26) is
-				write_reg_addr_p <= instr(25 downto 21);
-				reg_2_p <= register_data(instr(20 downto 16)); --from r2
-				reg_3_p <= register_data(instr(15 downto 0)); --from imm
+				reg_1_p <= instr(25 downto 21);
+				reg_2_p <= instr(20 downto 16); --from r2
+				imm_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
+				imm_p(MIPS_SIZE-1 downto 16) <= (others => '0');
 				when "100001" => --addi
-					alu_ctrl_p <= "010"
+					alu_ctrl_p <= "010";
 				when "000010" => --beq
 					case instr(15) is
 						when "1" =>
@@ -88,17 +104,21 @@ begin
 	end case
 	process(clk,rst)
 	begin
-	if rst='1' then
-		reg_read_2 <= (others => '0');
-		reg_read_3 <= (others => '0');
-		alu_ctrl <= (others => '0');
-		sign_extend <= (others => '0');
-	elsif rising_edge(clk) then 
-		reg_read_2 <= reg_2_p;
-		reg_read_3 <= reg_3_p;
-		alu_ctrl <= alu_ctrl_p;
-		sign_extend <= sign_extend_p;
-	end if;
+		if rst='1' then
+			imm <= (others => '0');
+			reg_1 <= (others => '0');
+			reg_2 <= (others => '0');
+			reg_3 <= (others => '0');
+			alu_ctrl <= (others => '0');
+			sign_extend <= (others => '0');
+		elsif rising_edge(clk) then 
+			imm <= imm_p;
+			reg_1 <= reg_1_p;
+			reg_2 <= reg_2_p;
+			reg_3 <= reg_3_p;
+			alu_ctrl <= alu_ctrl_p;
+			sign_extend <= sign_extend_p;
+		end if;
 	end process;
 end behavior
 		
