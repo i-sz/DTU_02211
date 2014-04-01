@@ -19,8 +19,8 @@ port(
 	
 	ctrl : out std_logic_vector(2 downto 0);
 	
-	jump_instr : in std_logic;
-	jump_addr : out std_logic;
+	jump_instr : in std_logic_vector(7 downto 0);
+	jump_addr : out std_logic_vector(7 downto 0);
 
 	branch_out : out std_logic_vector(7 downto 0)
 	
@@ -34,12 +34,12 @@ architecture behaviour of execute is
 signal input_a, input_b, alu_output : std_logic_vector(7 downto 0);
 --signal alu_ctrl : std_logic_vector(2 downto 0); 
 
-signal branch_add, jump_add : std_logic_vector(7 downto 0);
+signal branch_add, jump_add, jump_addr_p : std_logic_vector(7 downto 0);
 --signals for the pipeline stage
 
 signal alu_result_p : std_logic_vector(7 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
-signal jump_addr_p : std_logic;
+
 signal branch_out_p : std_logic_vector(7 downto 0);
 
 
@@ -77,8 +77,8 @@ branch_add <= pc_addr_in (7 DOWNTO 2) + sign_extend (7 DOWNTO 0);
 branch_out_p <= branch_add (7 DOWNTO 0); 
  
  --Jumping
-jump_add <= jump_instr (7 DOWNTO 0);
-jump_address_p <= jump_add;
+jump_add <= jump_instr; --??
+jump_addr_p <= jump_add;
 
 
 --pipeline stage
