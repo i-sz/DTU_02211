@@ -18,7 +18,7 @@ entity instr_decode is
 		reg_read_2 : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		reg_read_3 : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		write_reg_addr : out std_logic_vector(4 downto 0);
-		jmp_dst : out std_logic_vector(25 downto 0);
+		jmp_addr : out std_logic_vector(25 downto 0);
 		pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		-- alu_ctrl = 010 -> ADD, 110 -> SUB, 000 -> AND, 001 -> OR, 111 -> SLT, 100 -> MULT, 011 -> DIV
@@ -30,14 +30,15 @@ architecture behavior of instr_decode is
 	type register_array is array (0 to 31) of std_logic_vector(31 downto 0);
 	signal register_data : register_array;
 begin
-	process(instr)
+	process(clk,rst)
 	begin
+	if rising_edge(clk) then
 		case instr(31 downto 26) is
 			when "000000" => --register functions
+				-- read register 2 and 3 and get register write address
 				write_reg_addr <= instr(25 downto 21);
-				reg_read_2 <= register_data(CONV_INTEGER(instr(20 downto 16)));
-				reg_read_3 <= register_data(CONV_INTEGER(instr(15 downto 11)));
-			-- read register 1, 2 and 3
+				reg_read_2 <= register_data(CONV_INTEGER(instr(20 downto 16))); --from r2
+				reg_read_3 <= register_data(CONV_INTEGER(instr(15 downto 11))); --from r3
 				case instr(5 downto 0) is
 					when "100000" => --add
 						alu_ctrl <= "010"
@@ -58,11 +59,11 @@ begin
 					when others =>
 				end case;
 			when "000001" => --jmp
-				jmp_dst <= instr(25 downto 0);
+				jmp_addr <= instr(25 downto 0);
 			when others => --immediate and rest
 				case instr(31 downto 26) is
 					write_reg_addr <= instr(25 downto 21);
-					reg_read_2 <= register_data(CONV_INTEGER(instr(20 downto 16)));
+					reg_read_2 <= register_data(CONV_INTEGER(instr(20 downto 16))); --from r2
 					reg_read_3 <= register_data(CONV_INTEGER(instr(15 downto 0))); --from imm
 					when "100001" => --addi
 						alu_ctrl <= "010"
@@ -72,6 +73,7 @@ begin
 					when others =>
 				end case;
 		end case
+	end if;
 	end process;
 end behavior
 		
