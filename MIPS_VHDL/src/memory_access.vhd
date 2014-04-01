@@ -84,3 +84,32 @@ BEGIN
 	end COMPONENT;
 
 END behaviour;
+
+
+------------------- Memory access to Write Back registers  -------------------
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+
+ENTITY MEM_WB_regs is
+port(
+	clk : in std_logic;
+	rst : in std_logic;
+	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0); 
+	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
+	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
+	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
+);
+end MEM_WB_regs; 
+
+ARCHITECTURE behaviour OF MEM_WB_regs IS
+
+
+BEGIN
+  process (clk, rst, )
+
+END behaviour;
