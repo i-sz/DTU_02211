@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;		
 use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_signed.ALL;
 use IEEE.numeric_std.all;
 
 entity  execute is
