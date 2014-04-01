@@ -1,4 +1,3 @@
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;		
 use IEEE.numeric_std.all;
@@ -63,21 +62,21 @@ port map(
 	input_a <= input_a,
 	input_b <= input_b,
 	ctrl <= alu_ctrl,
-	output <= alu_result
+	output <= alu_result_p
 );	
 
 
 input_a <= A;
 input_b <= B when (alu_src ='0') else sign_extend;
-ctrl <= alu_ctrl;
+ctrl_p <= alu_ctrl;
 
 --Branching
 branch_add <= pc_addr_in (7 DOWNTO 2) + sign_extend (7 DOWNTO 0);
-branch_out <= branch_add (7 DOWNTO 0); 
+branch_out_p <= branch_add (7 DOWNTO 0); 
  
  --Jumping
 jump_add <= jump_instr (7 DOWNTO 0);
-jump_address <= jump_add;
+jump_address_p <= jump_add;
 
 
 --pipeline stage
