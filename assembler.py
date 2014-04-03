@@ -16,6 +16,28 @@
 
 import re
 
+def twos_comp(binary):
+    binary = list(binary)
+    #Flip bits
+    for i in range(0,len(binary)):
+        if binary[i] == "0":
+            binary[i] = "1"
+        else:
+            binary[i] = "0"
+    #Add 1
+    for i in range(len(binary)-1,-1,-1):
+        if binary[i] == "1":
+            binary[i] = "0"
+        else:
+            binary[i] = "1"
+            break
+    #Reconstruct string
+    binary_ret = ""
+    for i in range(0,len(binary)):
+        binary_ret = binary_ret + binary[i]
+    return binary_ret
+    
+
 def convert_regs(regs):
     binary = ""
     for reg in regs:
@@ -32,12 +54,11 @@ def convert_regs(regs):
 
 def convert_imm(imm):
     imm = int(imm)
-    if imm < 0:
-        binary = "1"
-    else:
-        binary = "0"
+    binary = ""
     if imm > -pow(2,15) and imm < pow(2,15):
-        binary = binary + '{0:015b}'.format(abs(imm))
+        binary = binary + '{0:016b}'.format(abs(imm))
+        if imm < 0:
+            binary = twos_comp(binary)
     else:
         return False
     # print binary
@@ -45,16 +66,15 @@ def convert_imm(imm):
 
 def convert_dst(dst):
     dst = int(dst)
-    if dst < 0:
-        binary = "1"
-    else:
-        binary = "0"
+    binary = ""
     if dst > -pow(2,25) and dst < pow(2,25):
-        binary = binary + '{0:025b}'.format(abs(dst))
+        binary = binary + '{0:026b}'.format(abs(dst))
+        if dst < 0:
+            binary = twos_comp(binary)
     else:
         return False
     # print binary
-    return binary
+    return str(binary)
     
 
 def parse_reg(line):
@@ -123,7 +143,7 @@ def parse_jmp(line):
     op = parts[0]
     dst = parts[1]
     if re.search("jmp", op):
-        op_binary = "0000001"
+        op_binary = "000001"
     else:
         op_binary = False
     dst_binary = convert_dst(dst)
