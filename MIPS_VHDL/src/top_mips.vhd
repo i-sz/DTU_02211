@@ -42,14 +42,18 @@ end component;
 component instr_decode is
 port(
 	clk : in std_logic;
+	rst : in std_logic;
 	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_1 : out std_logic_vector(4 downto 0);
+	reg_2 : out std_logic_vector(4 downto 0);
+	reg_3 : out std_logic_vector(4 downto 0);
+	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	jmp_addr : out std_logic_vector(25 downto 0);
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_reg : in std_logic_vector(ADDR_SIZE-1 downto 0);
-	offset : out std_logic_vector(MIPS_SIZE-1 downto 0);
-    r2_addr, r3_addr: out std_logic_vector(ADDR_SIZE-1 downto 0);
-	r1,r2,r3 : out std_logic_vector(MIPS_SIZE-1 downto 0)
+	sign_extend = out std_logic_vector(7 downto 0);
+	-- alu_ctrl = 010 -> ADD, 110 -> SUB, 000 -> AND, 001 -> OR, 111 -> SLT, 100 -> MULT, 011 -> DIV, 101 -> SHIFT
+	alu_ctrl : out std_logic_vector(2 downto 0);
 );
 end component;
 
@@ -138,16 +142,17 @@ port map(
 instr_decode_i : instr_decode
 port map(
 	clk => clock,
+	rst => reset,
 	instr => instr_s,
+	reg_1_addr => r1_addr,
+	reg_2_addr => r2_addr,
+	reg_3_addr => r3_addr,
+	imm => imm_s,
+	jmp_addr => jmp_addr_s,
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
-	wr_data => wr_data_s,
-	wr_reg => wr_reg_stage2,
-	offset => offset_s,
-    r2_addr => r2_addr_s
-	r3_addr=> r3_addr_s,
-	r1 => r1_s,
-	r2 => r2_s
+	sign_extend => sign_extend,
+	alu_ctrl => alu_ctrl_s
 );			
 	
 execute_i : execute

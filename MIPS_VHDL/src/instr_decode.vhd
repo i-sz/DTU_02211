@@ -15,9 +15,9 @@ entity instr_decode is
 		clk : in std_logic;
 		rst : in std_logic;
 		instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_1 : out std_logic_vector(4 downto 0);
-		reg_2 : out std_logic_vector(4 downto 0);
-		reg_3 : out std_logic_vector(4 downto 0);
+		reg_1_addr : out std_logic_vector(4 downto 0);
+		reg_2_addr : out std_logic_vector(4 downto 0);
+		reg_3_addr : out std_logic_vector(4 downto 0);
 		imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		jmp_addr : out std_logic_vector(25 downto 0);
 		pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -129,16 +129,16 @@ port map(
 	begin
 		if rst='1' then
 			imm <= (others => '0');
-			reg_1 <= (others => '0');
-			reg_2 <= (others => '0');
-			reg_3 <= (others => '0');
+			reg_1_addr <= (others => '0');
+			reg_2_addr <= (others => '0');
+			reg_3_addr <= (others => '0');
 			alu_ctrl <= (others => '0');
 			sign_extend <= (others => '0');
 		elsif rising_edge(clk) then 
 			imm <= imm_p;
-			reg_1 <= reg_1_p;
-			reg_2 <= reg_2_p;
-			reg_3 <= reg_3_p;
+			reg_1_addr <= reg_1_p;
+			reg_2_addr <= reg_2_p;
+			reg_3_addr <= reg_3_p;
 			alu_ctrl <= alu_ctrl_p;
 			sign_extend <= sign_extend_p;
 		end if;
