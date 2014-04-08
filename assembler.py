@@ -16,15 +16,17 @@
 
 import re
 
+#Calculates two's complement from a binary string
+#and returns it
 def twos_comp(binary):
     binary = list(binary)
-    #Flip bits
+    #Flip bits from 1 to 0 and from 0 to 1
     for i in range(0,len(binary)):
         if binary[i] == "0":
             binary[i] = "1"
         else:
             binary[i] = "0"
-    #Add 1
+    #Add 1 to result
     for i in range(len(binary)-1,-1,-1):
         if binary[i] == "1":
             binary[i] = "0"
@@ -55,6 +57,7 @@ def convert_regs(regs):
 def convert_imm(imm):
     imm = int(imm)
     binary = ""
+    # 16-bit imm-value so between -2^15 and 2^15 (signed value)
     if imm > -pow(2,15) and imm < pow(2,15):
         binary = binary + '{0:016b}'.format(abs(imm))
         if imm < 0:
@@ -67,6 +70,7 @@ def convert_imm(imm):
 def convert_dst(dst):
     dst = int(dst)
     binary = ""
+    # 26-bit dst value so between -2^25 and 2^25 (signed value)
     if dst > -pow(2,25) and dst < pow(2,25):
         binary = binary + '{0:026b}'.format(abs(dst))
         if dst < 0:
