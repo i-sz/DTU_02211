@@ -66,7 +66,7 @@ port map(
 		reg_3 => open
 	);
 	
-	process(clk)
+	process(clk) --should put all needed in here -----------------------------------------------
 	begin
 	case instr(31 downto 26) is
 		when "000000" => --register functions
