@@ -40,9 +40,9 @@ component register_file is
 		clk : in std_logic;
 		rst : in std_logic;
 		rw	: in std_logic;
-		r1_addr	: in std_logic_vector(7 downto 0);
-		r2_addr	: in std_logic_vector(7 downto 0);
-		r3_addr	: in std_logic_vector(7 downto 0);
+		r1_addr	: in std_logic_vector(4 downto 0);
+		r2_addr	: in std_logic_vector(4 downto 0);
+		r3_addr	: in std_logic_vector(4 downto 0);
 		wr_data : in std_logic_vector(31 downto 0);
 		--signals from WB stage
 		rw : in std_logic;
@@ -67,7 +67,6 @@ port map(
 		wr_data => wr_data,
 		reg_2 => reg_2, 
 		reg_3 => reg_3
-
 	);
 	
 	
