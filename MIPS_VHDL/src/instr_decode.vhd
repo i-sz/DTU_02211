@@ -15,9 +15,9 @@ entity instr_decode is
 		clk : in std_logic;
 		rst : in std_logic;
 		instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_1_addr : out std_logic_vector(4 downto 0);
-		reg_2_addr : out std_logic_vector(4 downto 0);
-		reg_3_addr : out std_logic_vector(4 downto 0);
+		reg_1_addr : out std_logic_vector(ADDR_SIZE-1 downto 0);
+		reg_2_addr : out std_logic_vector(ADDR_SIZE-1 downto 0);
+		reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0);
 		imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		jmp_addr : out std_logic_vector(25 downto 0);
 		pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -29,7 +29,7 @@ entity instr_decode is
 end instr_decode;
 
 architecture behavior of instr_decode is
-	signal reg_1_p, reg_2_p, reg_3_p : std_logic_vector(4 downto 0);
+	signal reg_1_p, reg_2_p, reg_3_p : std_logic_vector(ADDR_SIZE-1 downto 0);
 	signal imm_p : std_logic_vector(MIPS_SIZE-1 downto 0);
 	signal jmp_addr_p : std_logic_vector(25 downto 0);
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
@@ -40,17 +40,17 @@ component register_file is
 		clk : in std_logic;
 		rst : in std_logic;
 		rw	: in std_logic;
-		r1_addr	: in std_logic_vector(4 downto 0);
-		r2_addr	: in std_logic_vector(4 downto 0);
-		r3_addr	: in std_logic_vector(4 downto 0);
-		wr_data : in std_logic_vector(31 downto 0);
+		r1_addr	: in std_logic_vector(ADDR_SIZE-1 downto 0);
+		r2_addr	: in std_logic_vector(ADDR_SIZE-1 downto 0);
+		r3_addr	: in std_logic_vector(ADDR_SIZE-1 downto 0);
+		wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		--signals from WB stage
 		rw : in std_logic;
-		wr_data : in std_logic_vector(31 downto 0);
+		wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		--
 		
-		reg_2 : out std_logic_vector(31 downto 0);
-		reg_3 : out std_logic_vector(31 downto 0)
+		reg_2 : out std_logic_vector(MIPS_SIZE-1 downto 0);
+		reg_3 : out std_logic_vector(MIPS_SIZE-1 downto 0)
 	);
 end component;	
 	

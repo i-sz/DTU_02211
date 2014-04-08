@@ -44,9 +44,9 @@ port(
 	clk : in std_logic;
 	rst : in std_logic;
 	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_1 : out std_logic_vector(4 downto 0);
-	reg_2 : out std_logic_vector(4 downto 0);
-	reg_3 : out std_logic_vector(4 downto 0);
+	reg_1 : out std_logic_vector(ADDR_SIZE-1 downto 0);
+	reg_2 : out std_logic_vector(ADDR_SIZE-1 downto 0);
+	reg_3 : out std_logic_vector(ADDR_SIZE-1 downto 0);
 	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	jmp_addr : out std_logic_vector(25 downto 0);
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
