@@ -11,7 +11,7 @@ use IEEE.numeric_std.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
 entity instr_decode is
-GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 8);
+GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	port(
 		clk : in std_logic;
 		rst : in std_logic;

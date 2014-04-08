@@ -17,7 +17,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 
 entity top_mips is
-GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 8);
+GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 port(
 	clock : in std_logic;
 	reset : in std_logic
