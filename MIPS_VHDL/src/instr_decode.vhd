@@ -66,63 +66,63 @@ port map(
 		reg_3 => open
 	);
 	
-	process(clk) --should put all needed in here -----------------------------------------------
+	process
 	begin
-	case instr(31 downto 26) is
-		when "000000" => --register functions
-			-- read register 2 and 3 and get register write address
-			reg_1_p <= instr(25 downto 21); --from r1
-			reg_2_p <= instr(20 downto 16); --from r2
-			reg_3_p <= instr(15 downto 11); --from r3
-			case instr(5 downto 0) is
-				when "100000" => --add
-					alu_ctrl_p <= "010";
-				when "100010" => --sub
-					alu_ctrl_p <= "110";
-				when "100100" => --mult
-					alu_ctrl_p <= "100";
-				when "100101" => --div
-					alu_ctrl_p <= "011";
-				when "101000" => --and
-					alu_ctrl_p <= "001";
-				when "101001" => --or
-					alu_ctrl_p <= "111";
-				when "110100" => --slt
-					alu_ctrl_p <= "100";
-				when "111000" => --srl
-					alu_ctrl_p <= "101";
-				when "111001" => --slr
-					alu_ctrl_p <= "101";
-				when others =>
-			end case;
-		when "000001" => --jmp
-			jmp_addr <= instr(25 downto 0);
-			case instr(25) is
-				when '1' =>
-					sign_extend_p <= '1' & instr(6 downto 0);
-				when others =>
-					sign_extend_p <= '0' & instr(6 downto 0);
-			end case;
-		when others => --immediate and rest
-			reg_1_p <= instr(25 downto 21);
-			reg_2_p <= instr(20 downto 16); --from r2
-			imm_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
-			imm_p(MIPS_SIZE-1 downto 16) <= (others => '0');
-			case instr(31 downto 26) is
-				when "100001" => --addi
-					alu_ctrl_p <= "010";
-				when "000010" => --beq
-					case instr(15) is
-						when '1' =>
-							sign_extend_p <= '1' & instr(6 downto 0);
-						when others =>
-							sign_extend_p <= '0' & instr(6 downto 0);
-					end case;
-				when "100000" => --lb
-				when "110000" => --sb
-				when others =>
-			end case;
-	end case;
+		case instr(31 downto 26) is
+			when "000000" => --register functions
+				-- read register 2 and 3 and get register write address
+				reg_1_p <= instr(25 downto 21); --from r1
+				reg_2_p <= instr(20 downto 16); --from r2
+				reg_3_p <= instr(15 downto 11); --from r3
+				case instr(5 downto 0) is
+					when "100000" => --add
+						alu_ctrl_p <= "010";
+					when "100010" => --sub
+						alu_ctrl_p <= "110";
+					when "100100" => --mult
+						alu_ctrl_p <= "100";
+					when "100101" => --div
+						alu_ctrl_p <= "011";
+					when "101000" => --and
+						alu_ctrl_p <= "001";
+					when "101001" => --or
+						alu_ctrl_p <= "111";
+					when "110100" => --slt
+						alu_ctrl_p <= "100";
+					when "111000" => --srl
+						alu_ctrl_p <= "101";
+					when "111001" => --slr
+						alu_ctrl_p <= "101";
+					when others =>
+				end case;
+			when "000001" => --jmp
+				jmp_addr <= instr(25 downto 0);
+				case instr(25) is
+					when '1' =>
+						sign_extend_p <= '1' & instr(6 downto 0);
+					when others =>
+						sign_extend_p <= '0' & instr(6 downto 0);
+				end case;
+			when others => --immediate and rest
+				reg_1_p <= instr(25 downto 21);
+				reg_2_p <= instr(20 downto 16); --from r2
+				imm_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
+				imm_p(MIPS_SIZE-1 downto 16) <= (others => '0');
+				case instr(31 downto 26) is
+					when "100001" => --addi
+						alu_ctrl_p <= "010";
+					when "000010" => --beq
+						case instr(15) is
+							when '1' =>
+								sign_extend_p <= '1' & instr(6 downto 0);
+							when others =>
+								sign_extend_p <= '0' & instr(6 downto 0);
+						end case;
+					when "100000" => --lb
+					when "110000" => --sb
+					when others =>
+				end case;
+		end case;
 	end process;
 	
 	process(clk,rst)
