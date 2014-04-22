@@ -81,7 +81,7 @@ GENERIC ( MIPS_SIZE : NATURAL; RAM_SIZE	: NATURAL; ADDR_SIZE : NATURAL );
 port(
 	clk : in std_logic;
 	rst : in std_logic; 
-	addr_in : in std_logic_vector(7 downto 0);
+	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
