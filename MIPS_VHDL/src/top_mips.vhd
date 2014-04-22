@@ -29,6 +29,7 @@ end top_mips;
 architecture structural of top_mips is
 
 component instr_fecth
+GENERIC (MIPS_SIZE: NATURAL; PC_incr: NATURAL := 4 );
 port(
 	clk	: in std_logic;
 	rst : in std_logic;
@@ -40,18 +41,19 @@ port(
 end component;
 
 component instr_decode is
+GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 port(
 	clk : in std_logic;
 	rst : in std_logic;
 	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_1 : out std_logic_vector(4 downto 0);
-	reg_2 : out std_logic_vector(4 downto 0);
-	reg_3 : out std_logic_vector(4 downto 0);
+	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0);
 	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	jmp_addr : out std_logic_vector(25 downto 0);
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	sign_extend : out std_logic_vector(7 downto 0);
+	sign_extend : out std_logic_vector(31 downto 0);
 	alu_ctrl : out std_logic_vector(2 downto 0)
 );
 end component;
@@ -59,25 +61,27 @@ end component;
 component execute is
 port(
 	clk : in std_logic;
-	rst : in std_logic;
-	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	r2_addr, r3_addr: out std_logic_vector(ADDR_SIZE-1 downto 0);
-	r1,r2,r3 : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	offset : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	alu_output : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	r2_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	r2_r3_addr_out : std_logic_vector(ADDr_SIZE-1 downto 0)
+	rst : in std_logic; 
+	a   : in std_logic_vector(31 downto 0);
+	b   : in std_logic_vector(31 downto 0);
+	sign_extend : in std_logic_vector(31 downto 0);
+	alu_ctrl : in std_logic_vector(2 downto 0);
+	alu_src : in  std_logic;
+	pc_addr_in : in std_logic_vector(31 downto 0);
+	alu_result : out std_logic_vector(31 downto 0);
+	ctrl : out std_logic_vector(2 downto 0);
+	jump_instr : in std_logic_vector(7 downto 0);
+	jump_addr : out std_logic_vector(7 downto 0);
+	branch_out : out std_logic_vector(7 downto 0)
 );
 end component;
 
 component  memory_access is
+GENERIC ( MIPS_SIZE : NATURAL; RAM_SIZE	: NATURAL; ADDR_SIZE : NATURAL );
 port(
 	clk : in std_logic;
-	rst : in std_logic;
-	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0); 
-	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	rst : in std_logic; 
+	addr_in : in std_logic_vector(7 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
@@ -87,43 +91,44 @@ port(
 end component;   
 	
 component write_back is
+GENERIC ( MIPS_SIZE : NATURAL; ADDR_SIZE : NATURAL );
 port(
+	clk : in std_logic;
 	rst : in std_logic; 
-	addr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
+	rd_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	alu_result : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	wr_reg_in  : in std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
-	wr_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	rd_data : in std_logic_vector(MIPS_SIZE-1 downto 0)
+	wr_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
+
 );
 end component;
 
 
 --------internal signals-------
 -- Instr_Fetch	
-signal pc_sel_s                        : std_logic;
+signal pc_sel_s                        : std_logic := '0';
 signal pc_addr_stage1                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal instr_s                         : std_logic_vector(MIPS_SIZE-1 downto 0);	
 
 -- Instr_decode
 signal wr_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal wr_reg_stage2                   : std_logic_vector(ADDR_SIZE-1 downto 0);
-signal offset_s                        : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal r1_addr_s,r2_addr_s,r3_addr_s   : std_logic_vector(ADDR_SIZE-1 downto 0);
-signal r1_s,r2_s,r3_s                  : std_logic_vector(MIPS_SIZE-1 downto 0);
+signal r1_s,r2_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
+signal r3_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
 signal imm_s                           : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal jmp_addr_s                      : std_logic_vector(25 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal sign_extend_s                   : std_logic_vector(7 downto 0);
+signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 
 
 
 -- execute
 signal pc_addr_stage3                    : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal pc_addr_out_s                     : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal alu_output_s                      : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal r2_stage3                         : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal r2_r3_addr_out_s                  : std_logic_vector(ADDr_SIZE-1 downto 0);
+signal ctrl_s                            : std_logic_vector(2 downto 0);
+signal jump_addr_s                       : std_logic_vector(7 downto 0);
+signal branch_out_s                      : std_logic_vector(7 downto 0);
 
 
 	
@@ -143,23 +148,25 @@ BEGIN
 --Port maps
 
 instr_fetch_i : instr_fecth
+GENERIC Map (MIPS_SIZE,4)
 port map(
 	clk	=> clock,
 	rst => reset,
 	pc_sel => pc_sel_s,
-	pc_addr_in => pc_addr_stage4,
+	pc_addr_in => pc_addr_stage2,
 	pc_addr_out => pc_addr_stage1,
 	instr => instr_s 
 	);
 
 instr_decode_i : instr_decode
+GENERIC Map (MIPS_SIZE, ADDR_SIZE)
 port map(
 	clk => clock,
 	rst => reset,
 	instr => instr_s,
-	reg_1 => r1_addr_s,
-	reg_2 => r2_addr_s,
-	reg_3 => r3_addr_s,
+	reg_1_data => r1_s,
+	reg_2_data => r2_s,
+	reg_3_addr => r3_addr_s,
 	imm => imm_s,
 	jmp_addr => jmp_addr_s,
 	pc_addr_in => pc_addr_stage1,
@@ -172,43 +179,45 @@ execute_i : execute
 port map(
 	clk => clock,
 	rst => reset,
+	a => r1_s,
+	b => r2_s,
+	sign_extend => sign_extend_s,
+	alu_ctrl => alu_ctrl_s,
+	alu_src => '0',
 	pc_addr_in => pc_addr_stage2,
-	r2_addr => r2_addr_s,
-	r3_addr => r3_addr_s,
-	r1	=> r1_s,
-	r2  => r2_s,
-	r3  => r3_s,
-	offset => offset_s,
-	pc_addr_out => pc_addr_stage3,
-	alu_output => alu_output_s,
-	r2_out => r2_stage3,
-	r2_r3_addr_out => r2_r3_addr_out_s
-);	
+	alu_result => alu_output_s,
+	ctrl => ctrl_s,
+	jump_instr => jmp_addr_s(7 downto 0),
+    jump_addr  => jump_addr_s,
+	branch_out => branch_out_s
+	);	
 
-memory_access_i : memory_access  
+memory_access_i : memory_access
+GENERIC Map (MIPS_SIZE,5,ADDR_SIZE)  
 port map(
 	clk => clock,
-	rst => reset,
-	pc_addr_in => pc_addr_stage3,
-	pc_addr_out => pc_addr_stage4, 
+	rst => reset, 
 	addr_in => alu_output_s, 
 	addr_out => addr_s,
-	wr_reg_in => r2_r3_addr_out_s,
+	wr_reg_in => branch_out_s(4 downto 0),
 	wr_reg_out => wr_reg_stage4,
-	wr_data => r2_stage3,
+	wr_data => alu_output_s,
 	rd_data => rd_data_s
 	
 );
 
 
 write_back_i : write_back
+GENERIC Map (MIPS_SIZE, ADDR_SIZE)
 port map(
+    clk => clock,
 	rst => reset,
-	addr => addr_s,
+	rd_data => rd_data_s,
+	alu_result => addr_s,
 	wr_reg_in => wr_reg_stage4,
 	wr_reg_out => wr_reg_stage5,
-	wr_data => wr_data_s,
-	rd_data => rd_data_s
+	wr_data => wr_data_s
+
 );
 	
 
