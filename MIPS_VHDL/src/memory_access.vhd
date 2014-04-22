@@ -48,7 +48,9 @@ ARCHITECTURE behaviour OF memory_access IS
 		rd_data_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
 	);
 	end COMPONENT;
-
+  
+   signal rd_data_s : std_logic_vector(MIPS_SIZE-1 downto 0);
+  
 BEGIN
 
 	Data_Mem_RAM: Data_Memory 
@@ -58,7 +60,7 @@ BEGIN
 		addr => addr_in,
 		ram_write => '1',
 		ram_read => '0',
-		ramdata_out => rd_data
+		ramdata_out => rd_data_s
 	);
 
 	MEM_WB_regs_i : MEM_WB_regs
@@ -69,7 +71,7 @@ BEGIN
 		addr_out => addr_out,
 		wr_reg_in => wr_reg_in,
 		wr_reg_out => wr_reg_out,
-		rd_data_in => wr_data,
+		rd_data_in => rd_data_s,
 		rd_data_out => rd_data
 	);
 
