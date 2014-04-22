@@ -8,7 +8,7 @@ END top_mips_tb;
 ARCHITECTURE tb_arc OF top_mips_tb IS
   
 component top_mips is
-GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
+GENERIC (MIPS_SIZE: NATURAL; ADDR_SIZE: NATURAL);
 port(
 	clock : in std_logic;
 	reset : in std_logic
