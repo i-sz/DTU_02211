@@ -4,7 +4,7 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY  instr_fecth is
-GENERIC (MIPS_SIZE: NATURAL; PC_incr: NATURAL := 4 );
+GENERIC (MIPS_SIZE: NATURAL; PC_incr: NATURAL );
 port(
 	clk	: in std_logic;
 	rst : in std_logic;
@@ -55,7 +55,7 @@ ARCHITECTURE behaviour OF instr_fecth IS
 		  rst  : IN std_logic;
 		  pc_addr_in	    : IN	std_logic_vector(N-1 downto 0);
 		  instr_reg_in	    : IN	std_logic_vector(N-1 downto 0);	
-		  pc_addr_out       : OUT	std_logic_vector(N-1 downto 0);
+		  pcaddr_out       : OUT	std_logic_vector(N-1 downto 0);
 		  instr_reg_out     : OUT	std_logic_vector(N-1 DOWNTO 0));
     END component;
 	
@@ -63,6 +63,7 @@ ARCHITECTURE behaviour OF instr_fecth IS
 	SIGNAL PC_tmp2 : std_logic_vector(MIPS_SIZE DOWNTO 0);
 
 BEGIN
+
      PC: reg
 		GENERIC Map (N => MIPS_SIZE) -- Width of inputs.
 		PORT Map (Ain  => PC_tmp1,
@@ -73,7 +74,7 @@ BEGIN
 
      PCadder: adder
 		GENERIC Map (N => MIPS_SIZE)
-		PORT Map (adderin1 => PC_tmp1,
+		PORT Map (adderin1 => PC_tmp3,
 			adderin2 => std_logic_vector(to_unsigned(PC_incr,MIPS_SIZE)),
 			Cin => '0',
 	        Cout => PC_tmp2(MIPS_SIZE),
@@ -82,7 +83,7 @@ BEGIN
 
      Instr_Memory1 :Instr_Memory
         GENERIC Map(N => MIPS_SIZE)	 
-        port Map ( address => PC_tmp1,
+        port Map ( address => PC_tmp3,
 			data => Instr_tmp 
 		);
 		
@@ -91,7 +92,7 @@ BEGIN
 		port map (in0 => PC_tmp2(MIPS_SIZE-1 downto 0), 
 		     in1 => pc_addr_in,
 			 sel => pc_sel,
-			 y  => PC_tmp3
+			 y  => PC_tmp1
 		);
 		
 	 fetch_decode_regs: ifetch_idecode_regs
@@ -100,7 +101,7 @@ BEGIN
 			  rst   => rst,
 			  pc_addr_in => PC_tmp2(MIPS_SIZE-1 downto 0),
 			  instr_reg_in => Instr_tmp,
-			  pc_addr_out => pc_addr_out,
+			  pcaddr_out => pc_addr_out,
 			  instr_reg_out   => instr  
 		);
 
@@ -116,7 +117,7 @@ Entity ifetch_idecode_regs is
 		  rst  : IN std_logic;
 	      pc_addr_in	    : IN	std_logic_vector(N-1 downto 0);
 	      instr_reg_in	    : IN	std_logic_vector(N-1 downto 0);	
-	      pc_addr_out       : OUT	std_logic_vector(N-1 downto 0);
+	      pcaddr_out       : OUT	std_logic_vector(N-1 downto 0);
 		  instr_reg_out     : OUT	std_logic_vector(N-1 DOWNTO 0)
 	);
 	END ifetch_idecode_regs;
@@ -125,10 +126,10 @@ ARCHITECTURE behaviour OF ifetch_idecode_regs IS
    process(clk,rst,pc_addr_in,instr_reg_in)     
     begin
     if (rst = '1') then
-      pc_addr_out <= (others => '0');
+      pcaddr_out <= (others => '0');
 	  instr_reg_out <= (others => '0');
     elsif clk'event and clk = '1' then
-      pc_addr_out <= pc_addr_in;
+      pcaddr_out <= pc_addr_in;
 	  instr_reg_out <= instr_reg_in;    
 	end if;
   end process;
