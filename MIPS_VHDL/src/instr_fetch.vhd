@@ -30,7 +30,7 @@ ARCHITECTURE behaviour OF instr_fecth IS
     component Instr_Memory
 	    GENERIC (N:     NATURAL := MIPS_SIZE); -- Width of inputs.
         port ( address : in std_logic_vector(N-1 downto 0);			
-			data    : inout std_logic_vector(N-1 downto 0));
+			data    : out std_logic_vector(N-1 downto 0));
 	END component;
 
 	component reg
