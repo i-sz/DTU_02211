@@ -3,11 +3,10 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY memory_access is
+	GENERIC ( MIPS_SIZE : NATURAL; RAM_SIZE	: NATURAL; ADDR_SIZE : NATURAL );
 port(
 	clk : in std_logic;
 	rst : in std_logic;
-	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0); 
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
@@ -19,12 +18,11 @@ end memory_access;
 
 ARCHITECTURE behaviour OF memory_access IS
 
-
 	COMPONENT Data_Memory 
 	GENERIC
 	(
-		MIPS_SIZE    	: integer range 0 to 10 := 10;
-		RAM_SIZE	    : integer range 0 to 16 := 16
+		MIPS_SIZE    	: NATURAL;
+		RAM_SIZE	    : NATURAL
 	);
 	PORT
 	(
@@ -38,50 +36,42 @@ ARCHITECTURE behaviour OF memory_access IS
     END COMPONENT;
 
 	COMPONENT MEM_WB_regs
+	GENERIC (MIPS_SIZE:    NATURAL; ADDR_SIZE : NATURAL ); -- Width of inputs.	
 	port(
 		clk : in std_logic;
-		rst : in std_logic;
-		pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0); 
+		rst : in std_logic; 
 		addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
 		wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
-		wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);;
-		rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
+		rd_data_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
+		rd_data_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
 	);
 	end COMPONENT;
-
-
 
 BEGIN
 
-
-
 	Data_Mem_RAM: Data_Memory 
-	GENERIC map	( MIPS_SIZE=>; RAM_SIZE	=> )
+	GENERIC map	( MIPS_SIZE, RAM_SIZE)
 	PORT map (rst => rst,
-		ramdata_in => ,
-		addr => ,
-		ram_write => ,
-		ram_read => ,
-		ramdata_out => 
+		ramdata_in => wr_data,
+		addr => addr_in,
+		ram_write => '1',
+		ram_read => '0',
+		ramdata_out => rd_data
 	);
-    END COMPONENT;
 
-	COMPONENT MEM_WB_regs
-	port map (clk  => ,
-		rst => ,
-		pc_addr_in => ,
-		pc_addr_out => ,
-		addr_in => ,
-		addr_out => ,
-		wr_reg_in => ,
-		wr_reg_out => ,
-		wr_data => ,
-		rd_data => 
+	MEM_WB_regs_i : MEM_WB_regs
+	GENERIC map	( MIPS_SIZE, ADDR_SIZE)
+	port map (clk  => clk,
+		rst => rst,
+		addr_in => addr_in,
+		addr_out => addr_out,
+		wr_reg_in => wr_reg_in,
+		wr_reg_out => wr_reg_out,
+		rd_data_in => wr_data,
+		rd_data_out => rd_data
 	);
-	end COMPONENT;
 
 END behaviour;
 
@@ -92,17 +82,16 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY MEM_WB_regs is
+	GENERIC ( MIPS_SIZE : NATURAL; ADDR_SIZE : NATURAL );
 port(
 	clk : in std_logic;
-	rst : in std_logic;
-	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0); 
+	rst : in std_logic; 
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
-	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
+	rd_data_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	rd_data_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
 );
 end MEM_WB_regs; 
 
@@ -110,6 +99,16 @@ ARCHITECTURE behaviour OF MEM_WB_regs IS
 
 
 BEGIN
-  process (clk, rst, )
-
+  process (clk,rst,addr_in,wr_reg_in,rd_data_in )
+  begin
+	  if (rst = '1') then
+		  addr_out    <= (others => '0');
+		  wr_reg_out  <= (others => '0');
+		  rd_data_out <= (others => '0');
+		elsif clk'event and clk = '1' then
+		  addr_out    <= addr_in;
+		  wr_reg_out  <= wr_reg_in;
+		  rd_data_out <= rd_data_in;    
+		end if;
+ end process;
 END behaviour;
