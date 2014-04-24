@@ -9,6 +9,8 @@ port(
 	rst : in std_logic; 
 	a   : in std_logic_vector(31 downto 0);
 	b   : in std_logic_vector(31 downto 0);
+	reg3_addr_i : in  std_logic_vector(4 downto 0);
+	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb
 	sign_extend : in std_logic_vector(31 downto 0);
 	alu_ctrl : in std_logic_vector(2 downto 0);
 	alu_src : in  std_logic;
@@ -19,7 +21,6 @@ port(
 	jump_addr : out std_logic_vector(7 downto 0);
 	branch_out : out std_logic_vector(7 downto 0)
 );
-
 end execute;
 
 
@@ -78,12 +79,14 @@ begin
 		ctrl <= (others => '0');
 		jump_addr <= (others => '0');
 		branch_out <= (others => '0');
+		reg3_addr_o <= (others => '0');
 
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
 		ctrl <= ctrl_p;
 		jump_addr <= jump_addr_p;
 		branch_out <= branch_out_p;
+		reg3_addr_o <= reg3_addr_i;
 	end if;
 end process;	  
 		
