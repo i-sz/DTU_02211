@@ -199,10 +199,14 @@ with open('IS.asm') as input_file:
         binary = check_line(line.rstrip().lstrip())
         #If there is no errors parsing code, output it
         if binary != False:
-            #Print output
-            print binary
-            #Write output to file
-            output.write(binary)
+            if len(binary) == 32:
+                #Print output
+                print binary
+                #Write output to file
+                output.write(binary)
+            else:
+                print "Error!!"
+                exit(0)
     #Close output file
     output.close()
 #Program finished
