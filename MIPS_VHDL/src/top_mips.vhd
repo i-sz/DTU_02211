@@ -48,8 +48,11 @@ port(
 	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0);
+	wr_flag    : in std_logic;
+    reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
 	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
 	jmp_addr : out std_logic_vector(25 downto 0);
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -64,6 +67,8 @@ port(
 	rst : in std_logic; 
 	a   : in std_logic_vector(31 downto 0);
 	b   : in std_logic_vector(31 downto 0);
+	reg3_addr_i : in  std_logic_vector(ADDR_SIZE-1 downto 0);
+	reg3_addr_o : out  std_logic_vector(ADDR_SIZE-1  downto 0); -- decide if wb is needed and pass the address to wb
 	sign_extend : in std_logic_vector(31 downto 0);
 	alu_ctrl : in std_logic_vector(2 downto 0);
 	alu_src : in  std_logic;
@@ -99,6 +104,7 @@ port(
 	alu_result : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_reg_in  : in std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
+	wr_flag : out std_logic;
 	wr_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
 
 );
@@ -115,11 +121,14 @@ signal instr_s                         : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal wr_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r1_s,r2_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r3_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal r3_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal imm_s                           : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal jmp_addr_s                      : std_logic_vector(25 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
+signal wr_flag_s                       : std_logic;
+
 
 
 
@@ -129,7 +138,8 @@ signal alu_output_s                      : std_logic_vector(MIPS_SIZE-1 downto 0
 signal ctrl_s                            : std_logic_vector(2 downto 0);
 signal jump_addr_s                       : std_logic_vector(7 downto 0);
 signal branch_out_s                      : std_logic_vector(7 downto 0);
-
+signal reg3_addr_id_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal reg3_addr_ex_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
 
 	
 -- memory_access
@@ -166,7 +176,10 @@ port map(
 	instr => instr_s,
 	reg_1_data => r1_s,
 	reg_2_data => r2_s,
-	reg_3_addr => r3_addr_s,
+	wr_flag => wr_flag_s, 
+	reg3_wb_addr => r3_addr_s, -- coming from wb
+	reg3_wb_data => r3_data_s, -- coming from wb
+	reg_3_addr => reg3_addr_id_s,  -- going to execution
 	imm => imm_s,
 	jmp_addr => jmp_addr_s,
 	pc_addr_in => pc_addr_stage1,
@@ -181,6 +194,8 @@ port map(
 	rst => reset,
 	a => r1_s,
 	b => r2_s,
+	reg3_addr_i => reg3_addr_id_s,
+	reg3_addr_o => reg3_addr_ex_s,
 	sign_extend => sign_extend_s,
 	alu_ctrl => alu_ctrl_s,
 	alu_src => '0',
@@ -215,8 +230,9 @@ port map(
 	rd_data => rd_data_s,
 	alu_result => addr_s,
 	wr_reg_in => wr_reg_stage4,
-	wr_reg_out => wr_reg_stage5,
-	wr_data => wr_data_s
+	wr_reg_out => r3_addr_s,
+	wr_flag => wr_flag_s, 
+	wr_data => r3_data_s
 
 );
 	
