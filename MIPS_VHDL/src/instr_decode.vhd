@@ -13,20 +13,22 @@ use IEEE.STD_LOGIC_ARITH.all;
 entity instr_decode is
 GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	port(
-		clk : in std_logic;
-		rst : in std_logic;
-		instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0);
-		imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		jmp_addr : out std_logic_vector(25 downto 0);
-		pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		sign_extend : out std_logic_vector(31 downto 0);
-		-- alu_ctrl = 010 -> ADD, 110 -> SUB, 000 -> AND, 001 -> OR, 111 -> SLT, 100 -> MULT, 011 -> DIV, 101 -> SHIFT
-		alu_ctrl : out std_logic_vector(2 downto 0)
-	);
+	clk : in std_logic;
+	rst : in std_logic;
+	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	wr_flag    : in std_logic;
+    reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
+	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
+	jmp_addr : out std_logic_vector(25 downto 0);
+	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	sign_extend : out std_logic_vector(31 downto 0);
+	alu_ctrl : out std_logic_vector(2 downto 0)
+);
 end instr_decode;
 
 architecture behaviour of instr_decode is
@@ -57,11 +59,11 @@ register_file_i : register_file
 port map(
 		clk => clk,
 		rst => rst,
-		rw  => '0',
+		rw  => wr_flag,
 		r1_addr	=> reg_1_p,
 		r2_addr	=> reg_2_p,
-		r3_addr	=> reg_3_p,
-		wr_data => (others => '0'),
+		r3_addr	=> reg3_wb_addr,
+		wr_data => reg3_wb_data,
 		reg_1 => reg_1data, 
 		reg_2 => reg_2data
 	);
@@ -135,7 +137,6 @@ port map(
 			imm <= (others => '0');
 			reg_1_data <= (others => '0');
 			reg_2_data <= (others => '0');
-			reg_3_addr <= (others => '0');
 			alu_ctrl <= (others => '0');
 			sign_extend <= (others => '0');
 		elsif rising_edge(clk) then 
