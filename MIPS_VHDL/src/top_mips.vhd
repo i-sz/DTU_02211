@@ -21,6 +21,8 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 port(
 	clock : in std_logic;
 	reset : in std_logic
+-- uart_wr_ena : in std_logic;
+-- rd_ena : in  
 --	uart_tx : out std_logic;
 --	uart_rx : in std_logic
 );
@@ -57,7 +59,8 @@ port(
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	sign_extend : out std_logic_vector(31 downto 0);
-	alu_ctrl : out std_logic_vector(2 downto 0)
+	alu_ctrl : out std_logic_vector(2 downto 0);
+	alu_src : out std_logic
 );
 end component;
 
@@ -67,8 +70,8 @@ port(
 	rst : in std_logic; 
 	a   : in std_logic_vector(31 downto 0);
 	b   : in std_logic_vector(31 downto 0);
-	reg3_addr_i : in  std_logic_vector(ADDR_SIZE-1 downto 0);
-	reg3_addr_o : out  std_logic_vector(ADDR_SIZE-1  downto 0); -- decide if wb is needed and pass the address to wb
+	reg3_addr_i : in  std_logic_vector(4 downto 0);
+	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb
 	sign_extend : in std_logic_vector(31 downto 0);
 	alu_ctrl : in std_logic_vector(2 downto 0);
 	alu_src : in  std_logic;
@@ -77,7 +80,9 @@ port(
 	ctrl : out std_logic_vector(2 downto 0);
 	jump_instr : in std_logic_vector(7 downto 0);
 	jump_addr : out std_logic_vector(7 downto 0);
-	branch_out : out std_logic_vector(7 downto 0)
+	branch_out : out std_logic_vector(7 downto 0);
+	pc_sel : out std_logic; -- controls the mux in IF
+	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
 );
 end component;
 
@@ -113,7 +118,7 @@ end component;
 
 --------internal signals-------
 -- Instr_Fetch	
-signal pc_sel_s                        : std_logic := '0';
+signal pc_sel_s                        : std_logic;
 signal pc_addr_stage1                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal instr_s                         : std_logic_vector(MIPS_SIZE-1 downto 0);	
 
@@ -128,6 +133,7 @@ signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 signal wr_flag_s                       : std_logic;
+signal alu_src_s								: std_logic;
 
 
 
@@ -163,7 +169,7 @@ port map(
 	clk	=> clock,
 	rst => reset,
 	pc_sel => pc_sel_s,
-	pc_addr_in => pc_addr_stage2,
+	pc_addr_in => pc_addr_stage3,
 	pc_addr_out => pc_addr_stage1,
 	instr => instr_s 
 	);
@@ -185,7 +191,8 @@ port map(
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
 	sign_extend => sign_extend_s,
-	alu_ctrl => alu_ctrl_s
+	alu_ctrl => alu_ctrl_s,
+	alu_src => alu_src_s
 );			
 	
 execute_i : execute
@@ -198,13 +205,16 @@ port map(
 	reg3_addr_o => reg3_addr_ex_s,
 	sign_extend => sign_extend_s,
 	alu_ctrl => alu_ctrl_s,
-	alu_src => '0',
+	alu_src => alu_src_s,
 	pc_addr_in => pc_addr_stage2,
 	alu_result => alu_output_s,
 	ctrl => ctrl_s,
 	jump_instr => jmp_addr_s(7 downto 0),
     jump_addr  => jump_addr_s,
-	branch_out => branch_out_s
+	branch_out => branch_out_s,
+	pc_sel => pc_sel_s,
+	pc_address_out => pc_addr_stage3
+	
 	);	
 
 memory_access_i : memory_access
