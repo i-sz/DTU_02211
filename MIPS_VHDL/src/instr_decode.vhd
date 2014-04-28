@@ -1,159 +1,136 @@
--------------- Decoding instrunctions------------
+-------------- Fetcing of instrunctions------------
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
--- 
--- DTU - 02211 Advanced computer architecture F14 
--- Harri Antero Laine(s131196)  Istvan Szonyi(s131153) Komlan Tom Evon(s072728)
-
-
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;		
-use IEEE.numeric_std.all;
-use IEEE.STD_LOGIC_ARITH.all;
-
-entity instr_decode is
-GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
-	port(
-	clk : in std_logic;
+ENTITY  instr_fecth is
+GENERIC (MIPS_SIZE: NATURAL; PC_incr: NATURAL );
+port(
+	clk	: in std_logic;
 	rst : in std_logic;
-	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_flag    : in std_logic;
-    reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
-	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
-	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
-	jmp_addr : out std_logic_vector(25 downto 0);
+	pc_sel : in std_logic;
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	sign_extend : out std_logic_vector(31 downto 0);
-	alu_ctrl : out std_logic_vector(2 downto 0);
-	alu_src : out std_logic
+	instr : out std_logic_vector(MIPS_SIZE-1 downto 0) 
 );
-end instr_decode;
+END instr_fecth;
 
-architecture behaviour of instr_decode is
-	signal reg_1_p, reg_2_p, reg_3_p : std_logic_vector(ADDR_SIZE-1 downto 0);
-	signal imm_p,reg_1data,reg_2data : std_logic_vector(MIPS_SIZE-1 downto 0);
-	signal jmp_addr_p : std_logic_vector(25 downto 0);
-	signal alu_ctrl_p : std_logic_vector(2 downto 0);
-	signal sign_extend_p : std_logic_vector(31 downto 0);
-	signal alu_src_s : std_logic;
+ARCHITECTURE behaviour OF instr_fecth IS
+
+	component adder                                
+		GENERIC (N:     NATURAL := MIPS_SIZE); -- Width of inputs.
+		PORT (
+			adderin1:  IN  std_logic_vector(N-1 DOWNTO 0);   -- Input.
+			adderin2:  IN  std_logic_vector(N-1 DOWNTO 0);   -- Input.
+			Cin:       IN  STD_LOGIC;
+	        Cout:      OUT STD_LOGIC;
+			adderout:  OUT std_logic_vector(N-1 DOWNTO 0));-- Output.
+	END component;
+
+    component Instr_Memory
+	    GENERIC (N:     NATURAL := MIPS_SIZE); -- Width of inputs.
+        port ( address : in std_logic_vector(N-1 downto 0);			
+			data    : out std_logic_vector(N-1 downto 0));
+	END component;
+
+	component reg
+		GENERIC (N:     NATURAL := MIPS_SIZE);                     -- Width of inputs.
+		PORT(
+			 Ain     : IN  std_logic_vector(N-1 DOWNTO 0);
+			 clk     : IN  std_logic;
+			 rst   : IN  std_logic;
+			 reg_out : OUT	std_logic_vector(N-1 DOWNTO 0));
+	END component;
 	
-component register_file is
-	port(
-		clk : in std_logic;
-		rst : in std_logic;
-		rw	: in std_logic;
-		r1_addr	: in std_logic_vector(ADDR_SIZE-1 downto 0);
-		r2_addr	: in std_logic_vector(ADDR_SIZE-1 downto 0);
-		r3_addr	: in std_logic_vector(ADDR_SIZE-1 downto 0);
-		wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
+	component mux2  -- two-input multiplexer
+		generic(N: NATURAL:= MIPS_SIZE);
+		port(in0, in1: in  STD_LOGIC_VECTOR(N-1 downto 0);
+			 sel:      in  STD_LOGIC;
+			 y:        out STD_LOGIC_VECTOR(N-1 downto 0));
+	end component;
+	
+	component ifetch_idecode_regs
+		GENERIC (N:     NATURAL);  -- Width of inputs.
+		PORT(clk     : IN  std_logic;
+		  rst  : IN std_logic;
+		  pc_addr_in	    : IN	std_logic_vector(N-1 downto 0);
+		  instr_reg_in	    : IN	std_logic_vector(N-1 downto 0);	
+		  pcaddr_out       : OUT	std_logic_vector(N-1 downto 0);
+		  instr_reg_out     : OUT	std_logic_vector(N-1 DOWNTO 0));
+    END component;
+	
+	SIGNAL PC_tmp1, PC_tmp3,Instr_tmp : std_logic_vector(MIPS_SIZE-1 DOWNTO 0);
+	SIGNAL PC_tmp2 : std_logic_vector(MIPS_SIZE DOWNTO 0);
+
+BEGIN
+
+     PC: reg
+		GENERIC Map (N => MIPS_SIZE) -- Width of inputs.
+		PORT Map (Ain  => PC_tmp1,
+			clk   => clk,
+			rst   => rst,
+			reg_out  => PC_tmp3 
+		);
+
+     PCadder: adder
+		GENERIC Map (N => MIPS_SIZE)
+		PORT Map (adderin1 => PC_tmp3,
+			adderin2 => std_logic_vector(to_unsigned(PC_incr,MIPS_SIZE)),
+			Cin => '0',
+	        Cout => PC_tmp2(MIPS_SIZE),
+			adderout =>PC_tmp2(MIPS_SIZE-1 downto 0) 
+	    );
+
+     Instr_Memory1 :Instr_Memory
+        GENERIC Map(N => MIPS_SIZE)	 
+        port Map ( address => PC_tmp3,
+			data => Instr_tmp 
+		);
 		
-		reg_1 : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		reg_2 : out std_logic_vector(MIPS_SIZE-1 downto 0)
-	);
-end component;	
-	
-begin
+     PC_Mux: mux2  -- two-input multiplexer
+		generic Map(N => MIPS_SIZE)
+		port map (in0 => PC_tmp2(MIPS_SIZE-1 downto 0), 
+		     in1 => pc_addr_in,
+			 sel => pc_sel,
+			 y  => PC_tmp1
+		);
+		
+	 fetch_decode_regs: ifetch_idecode_regs
+		GENERIC Map (N => MIPS_SIZE)  -- Width of inputs.
+		PORT Map (clk  => clk,
+			  rst   => rst,
+			  pc_addr_in => PC_tmp2(MIPS_SIZE-1 downto 0),
+			  instr_reg_in => Instr_tmp,
+			  pcaddr_out => pc_addr_out,
+			  instr_reg_out   => instr  
+		);
 
-register_file_i : register_file 
-port map(
-		clk => clk,
-		rst => rst,
-		rw  => wr_flag,
-		r1_addr	=> reg_1_p,
-		r2_addr	=> reg_2_p,
-		r3_addr	=> reg3_wb_addr,
-		wr_data => reg3_wb_data,
-		reg_1 => reg_1data, 
-		reg_2 => reg_2data
+END behaviour;
+
+------------------- instr fetch to decode registers  -------------------
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+
+Entity ifetch_idecode_regs is
+    GENERIC (N:     NATURAL);  -- Width of inputs.
+	PORT(clk     : IN  std_logic;
+		  rst  : IN std_logic;
+	      pc_addr_in	    : IN	std_logic_vector(N-1 downto 0);
+	      instr_reg_in	    : IN	std_logic_vector(N-1 downto 0);	
+	      pcaddr_out       : OUT	std_logic_vector(N-1 downto 0);
+		  instr_reg_out     : OUT	std_logic_vector(N-1 DOWNTO 0)
 	);
-	
-	process(clk, instr) --should put all needed in here -----------------------------------------------
-	begin
-	case instr(31 downto 26) is
-		when "000000" => --register functions
-			-- read register 2 and 3 and get register write address
-			reg_1_p <= instr(25 downto 21); --from r1
-			reg_2_p <= instr(20 downto 16); --from r2
-			reg_3_p <= instr(15 downto 11); --from r3
-			alu_src_s <= '0';
-			case instr(5 downto 0) is
-				when "100000" => --add
-					alu_ctrl_p <= "010";
-				when "100010" => --sub
-					alu_ctrl_p <= "110";
-				when "100100" => --mult
-					alu_ctrl_p <= "100";
-				when "100101" => --div
-					alu_ctrl_p <= "011";
-				when "101000" => --and
-					alu_ctrl_p <= "001";
-				when "101001" => --or
-					alu_ctrl_p <= "111";
-				when "110100" => --slt
-					alu_ctrl_p <= "100";
-				when "111000" => --srl
-					alu_ctrl_p <= "101";
-				when "111001" => --slr
-					alu_ctrl_p <= "101";
-				when others =>
-			end case;
-		when "000001" => --jmp
-			jmp_addr <= instr(25 downto 0);
-			alu_src_s <= '1';
-			case instr(25) is
-				when '1' =>
-					sign_extend_p(25 downto 0)  <= instr(25 downto 0);
-					sign_extend_p(31 downto 26) <= (others => '1');
-				when others =>
-					sign_extend_p(25 downto 0)  <= instr(25 downto 0);
-					sign_extend_p(31 downto 26) <= (others => '0');
-			end case;
-		when others => --immediate and rest
-			reg_1_p <= instr(25 downto 21); --from r1
-			reg_2_p <= instr(20 downto 16); --from r2
-			imm_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
-			imm_p(MIPS_SIZE-1 downto 16) <= (others => '0');
-			alu_src_s <= '1';
-			case instr(31 downto 26) is
-				when "100001" => --addi
-					alu_ctrl_p <= "010";
-				when "000010" => --beq
-					case instr(15) is
-						when '1' =>
-							sign_extend_p(15 downto 0)  <= instr(15 downto 0);
-							sign_extend_p(31 downto 16) <= (others => '1');
-						when others =>
-							sign_extend_p(15 downto 0)  <= instr(15 downto 0);
-							sign_extend_p(31 downto 16) <= (others => '0');
-					end case;
-				when "100000" => --lb
-				when "110000" => --sb
-				when others =>
-			end case;
-	end case;
-	end process;
-	
-	process(clk,rst,imm_p,reg_1data,reg_2data,reg_3_p,alu_ctrl_p,sign_extend_p,pc_addr_in)
-	begin
-		if rst='1' then
-			imm <= (others => '0');
-			reg_1_data <= (others => '0');
-			reg_2_data <= (others => '0');
-			alu_ctrl <= (others => '0');
-			alu_src <= '0';
-			sign_extend <= (others => '0');
-		elsif rising_edge(clk) then 
-			imm <= imm_p;
-			reg_1_data <= reg_1data;
-			reg_2_data <= reg_2data;
-			reg_3_addr <= reg_3_p;
-			alu_ctrl <= alu_ctrl_p;
-			sign_extend <= sign_extend_p;
-			pc_addr_out <= pc_addr_in;
-			alu_src <= alu_src_s;
-		end if;
-	end process;
+	END ifetch_idecode_regs;
+ARCHITECTURE behaviour OF ifetch_idecode_regs IS
+ Begin    
+   process(clk,rst,pc_addr_in,instr_reg_in)     
+    begin
+    if (rst = '1') then
+      pcaddr_out <= (others => '0');
+	  instr_reg_out <= (others => '0');
+    elsif clk'event and clk = '1' then
+      pcaddr_out <= pc_addr_in;
+	  instr_reg_out <= instr_reg_in;    
+	end if;
+  end process;
 end behaviour;
