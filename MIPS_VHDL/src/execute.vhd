@@ -17,9 +17,11 @@ port(
 	pc_addr_in : in std_logic_vector(31 downto 0);
 	alu_result : out std_logic_vector(31 downto 0);
 	ctrl : out std_logic_vector(2 downto 0);
-	jump_instr : in std_logic_vector(7 downto 0);
-	jump_addr : out std_logic_vector(7 downto 0);
-	branch_out : out std_logic_vector(7 downto 0)
+	jump_addr_in : in std_logic_vector(31 downto 0); --jump address
+	jump_addr_out : out std_logic_vector(31 downto 0);
+	branch_out : out std_logic_vector(7 downto 0);
+	pc_sel : out std_logic; -- controls the mux in IF
+	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
 );
 end execute;
 
@@ -27,11 +29,11 @@ end execute;
 architecture behaviour of execute is
 
 signal input_a, input_b : std_logic_vector(31 downto 0);
-signal branch_add, jump_add, jump_addr_p : std_logic_vector(7 downto 0);
+signal branch_add, jump_addr_out, jump_addr_p : std_logic_vector(31 downto 0);
 --signals for the pipeline stage
 signal alu_result_p : std_logic_vector(31 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
-signal branch_out_p : std_logic_vector(7 downto 0);
+signal branch_out_p : std_logic_vector(31 downto 0);
 
 
 
@@ -77,16 +79,19 @@ begin
 	if  rst='1' then
 		alu_result <= (others => '0');
 		ctrl <= (others => '0');
-		jump_addr <= (others => '0');
+		jump_addr_out <= (others => '0');
 		branch_out <= (others => '0');
 		reg3_addr_o <= (others => '0');
+		pc_sel <= '0';
+		pc_address_out <= (others => '0');
 
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
 		ctrl <= ctrl_p;
-		jump_addr <= jump_addr_p;
+		jump_addr_out <= jump_addr_p;
 		branch_out <= branch_out_p;
 		reg3_addr_o <= reg3_addr_i;
+		pc_address_out <= branch_address;
 	end if;
 end process;	  
 		
