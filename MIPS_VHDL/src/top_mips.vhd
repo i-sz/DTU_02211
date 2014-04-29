@@ -51,11 +51,9 @@ port(
 	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_flag    : in std_logic;
-    reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+        reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
 	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
-	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
-	jmp_addr : out std_logic_vector(25 downto 0);
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	sign_extend : out std_logic_vector(31 downto 0);
@@ -126,8 +124,6 @@ signal wr_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r1_s,r2_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r3_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
 signal r3_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal imm_s                           : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal jump_addr_s                      : std_logic_vector(25 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
@@ -185,8 +181,6 @@ port map(
 	reg3_wb_addr => r3_addr_s, -- coming from wb
 	reg3_wb_data => r3_data_s, -- coming from wb
 	reg_3_addr => reg3_addr_id_s,  -- going to execution
-	imm => imm_s,
-	jmp_addr => jmp_addr_s,
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
 	sign_extend => sign_extend_s,
@@ -208,7 +202,6 @@ port map(
 	pc_addr_in => pc_addr_stage2,
 	alu_result => alu_output_s,
 	ctrl => ctrl_s,
-   jump_addr_in  => jump_addr_s,
 	Jump_addr_out => ,
 	pc_sel => pc_sel_s,
 	pc_address_out => pc_addr_stage3
