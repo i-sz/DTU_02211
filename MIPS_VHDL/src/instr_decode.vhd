@@ -100,7 +100,7 @@ port map(
 				when others =>
 			end case;
 		when "000001" => --jmp
-			sign_extend_p <= instr(25 downto 0);
+			sign_extend_p(25 downto 0) <= instr(25 downto 0);
 			alu_src_s <= '1';
 			pc_sel_p <= '1';
 			case instr(25) is
@@ -124,7 +124,7 @@ port map(
 				when "100001" => --addi
 					alu_ctrl_p <= "010";
 				when "000010" => --beq
-					pc_sel_p <= '1'
+					pc_sel_p <= '1' ;
 				when "100000" => --lb
 				when "110000" => --sb
 				when others =>
