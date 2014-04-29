@@ -75,10 +75,10 @@ port(
 	alu_ctrl : in std_logic_vector(2 downto 0);
 	alu_src : in  std_logic;
 	pc_addr_in : in std_logic_vector(31 downto 0);
+	pc_sel_in : in std_logic;
 	alu_result : out std_logic_vector(31 downto 0);
 	ctrl : out std_logic_vector(2 downto 0);
-	jump_addr_out : out std_logic_vector(31 downto 0);
-	pc_sel : out std_logic; -- controls the mux in IF
+	pc_sel_out : out std_logic; -- controls the mux in IF
 	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
 	);
 end component;
@@ -129,7 +129,6 @@ signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 signal wr_flag_s                       : std_logic;
 signal alu_src_s					   : std_logic;
-signal pc_sel_s						   : std_logic;
 
 
 
@@ -142,7 +141,7 @@ signal jump_addr_s                       : std_logic_vector(7 downto 0);
 signal branch_out_s                      : std_logic_vector(7 downto 0);
 signal reg3_addr_id_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
 signal reg3_addr_ex_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
-
+signal pc_sel_ss : std_logic;
 	
 -- memory_access
 signal pc_addr_stage4                     : std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -164,7 +163,7 @@ GENERIC Map (MIPS_SIZE,4)
 port map(
 	clk	=> clock,
 	rst => reset,
-	pc_sel => pc_sel_s,
+	pc_sel => pc_sel_ss,
 	pc_addr_in => pc_addr_stage3,
 	pc_addr_out => pc_addr_stage1,
 	instr => instr_s 
@@ -202,10 +201,10 @@ port map(
 	alu_ctrl => alu_ctrl_s,
 	alu_src => alu_src_s,
 	pc_addr_in => pc_addr_stage2,
+	pc_sel_in =>  pc_sel_s,
 	alu_result => alu_output_s,
 	ctrl => ctrl_s,
-	Jump_addr_out => ,
-	pc_sel => pc_sel_s,
+	pc_sel_out =>  pc_sel_ss,
 	pc_address_out => pc_addr_stage3
 	
 	);	
