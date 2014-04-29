@@ -24,6 +24,7 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	pc_sel_out: out std_logic;
 	sign_extend : out std_logic_vector(31 downto 0);
 	alu_ctrl : out std_logic_vector(2 downto 0);
 	alu_src : out std_logic
@@ -35,7 +36,7 @@ architecture behaviour of instr_decode is
 	signal reg_1data,reg_2data : std_logic_vector(MIPS_SIZE-1 downto 0);
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(31 downto 0);
-	signal alu_src_s : std_logic;
+	signal alu_src_s, pc_sel_p : std_logic;
 	
 component register_file is
 	port(
@@ -69,6 +70,7 @@ port map(
 	
 	process(clk, instr) --should put all needed in here -----------------------------------------------
 	begin
+	pc_sel_p <= '0';
 	case instr(31 downto 26) is
 		when "000000" => --register functions
 			-- read register 2 and 3 and get register write address
@@ -100,6 +102,7 @@ port map(
 		when "000001" => --jmp
 			sign_extend_p <= instr(25 downto 0);
 			alu_src_s <= '1';
+			pc_sel_p <= '1';
 			case instr(25) is
 				when '1' =>
 					sign_extend_p(31 downto 26) <= (others => '1');
@@ -111,16 +114,17 @@ port map(
 			reg_2_p <= instr(20 downto 16); --from r2
 			alu_src_s <= '1';
 			sign_extend_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
-                        case instr(15) is
-			  when '1' =>
-				sign_extend_p(31 downto 16) <= (others => '1');
-			  when others =>
-				sign_extend_p(31 downto 16) <= (others => '0');
+			case instr(15) is
+				when '1' =>
+					sign_extend_p(31 downto 16) <= (others => '1');
+				when others =>
+					sign_extend_p(31 downto 16) <= (others => '0');
 			end case;			
 			case instr(31 downto 26) is
 				when "100001" => --addi
 					alu_ctrl_p <= "010";
 				when "000010" => --beq
+					pc_sel_p <= '1'
 				when "100000" => --lb
 				when "110000" => --sb
 				when others =>
@@ -136,6 +140,7 @@ port map(
 			alu_ctrl <= (others => '0');
 			alu_src <= '0';
 			sign_extend <= (others => '0');
+			pc_sel_out <= '0';
 		elsif rising_edge(clk) then 
 			reg_1_data <= reg_1data;
 			reg_2_data <= reg_2data;
@@ -144,6 +149,7 @@ port map(
 			sign_extend <= sign_extend_p;
 			pc_addr_out <= pc_addr_in;
 			alu_src <= alu_src_s;
+			pc_sel_out <= pc_sel_p;
 		end if;
 	end process;
 end behaviour;
