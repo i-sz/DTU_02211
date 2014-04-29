@@ -19,7 +19,6 @@ port(
 	ctrl : out std_logic_vector(2 downto 0);
 	jump_addr_in : in std_logic_vector(31 downto 0); --jump address
 	jump_addr_out : out std_logic_vector(31 downto 0);
-	branch_out : out std_logic_vector(7 downto 0);
 	pc_sel : out std_logic; -- controls the mux in IF
 	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
 );
@@ -29,11 +28,13 @@ end execute;
 architecture behaviour of execute is
 
 signal input_a, input_b : std_logic_vector(31 downto 0);
-signal branch_add, jump_addr_out, jump_addr_p : std_logic_vector(31 downto 0);
+signal branch_address, jump_addr_p : std_logic_vector(31 downto 0);
 --signals for the pipeline stage
 signal alu_result_p : std_logic_vector(31 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
-signal branch_out_p : std_logic_vector(31 downto 0);
+
+
+signal pc_sel_s : std_logic;
 
 
 
@@ -65,13 +66,10 @@ input_b <= B when (alu_src ='0') else sign_extend;
 ctrl_p <= alu_ctrl;
 
 --Branching
-branch_add <= std_logic_vector(unsigned(pc_addr_in(7 DOWNTO 2)) + unsigned(sign_extend(7 DOWNTO 0)));
-branch_out_p <= branch_add (7 DOWNTO 0); 
- 
+branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0)));
+pc_sel_s <= '1' when (a = x"00000000") else '0';  
  --Jumping
-jump_add <= jump_instr; --??
-jump_addr_p <= jump_add;
-
+jump_addr_p <= jump_addr_in;
 
 --pipeline stage
 process(clk,rst)
@@ -80,7 +78,6 @@ begin
 		alu_result <= (others => '0');
 		ctrl <= (others => '0');
 		jump_addr_out <= (others => '0');
-		branch_out <= (others => '0');
 		reg3_addr_o <= (others => '0');
 		pc_sel <= '0';
 		pc_address_out <= (others => '0');
@@ -89,9 +86,9 @@ begin
 		alu_result <= alu_result_p;
 		ctrl <= ctrl_p;
 		jump_addr_out <= jump_addr_p;
-		branch_out <= branch_out_p;
 		reg3_addr_o <= reg3_addr_i;
 		pc_address_out <= branch_address;
+		pc_sel <= pc_sel_s;
 	end if;
 end process;	  
 		
