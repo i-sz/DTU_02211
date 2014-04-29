@@ -19,11 +19,9 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_flag    : in std_logic;
-    reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+        reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
 	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
-	imm : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
-	jmp_addr : out std_logic_vector(25 downto 0);
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	sign_extend : out std_logic_vector(31 downto 0);
@@ -34,8 +32,7 @@ end instr_decode;
 
 architecture behaviour of instr_decode is
 	signal reg_1_p, reg_2_p, reg_3_p : std_logic_vector(ADDR_SIZE-1 downto 0);
-	signal imm_p,reg_1data,reg_2data : std_logic_vector(MIPS_SIZE-1 downto 0);
-	signal jmp_addr_p : std_logic_vector(25 downto 0);
+	signal reg_1data,reg_2data : std_logic_vector(MIPS_SIZE-1 downto 0);
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(31 downto 0);
 	signal alu_src_s : std_logic;
@@ -101,34 +98,29 @@ port map(
 				when others =>
 			end case;
 		when "000001" => --jmp
-			jmp_addr <= instr(25 downto 0);
+			sign_extend_p <= instr(25 downto 0);
 			alu_src_s <= '1';
 			case instr(25) is
 				when '1' =>
-					sign_extend_p(25 downto 0)  <= instr(25 downto 0);
 					sign_extend_p(31 downto 26) <= (others => '1');
 				when others =>
-					sign_extend_p(25 downto 0)  <= instr(25 downto 0);
 					sign_extend_p(31 downto 26) <= (others => '0');
 			end case;
 		when others => --immediate and rest
 			reg_1_p <= instr(25 downto 21); --from r1
 			reg_2_p <= instr(20 downto 16); --from r2
-			imm_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
-			imm_p(MIPS_SIZE-1 downto 16) <= (others => '0');
 			alu_src_s <= '1';
+			sign_extend_p(15 downto 0) <= instr(15 downto 0); --from imm (we want to user 32-bit values)
+                        case instr(15) is
+			  when '1' =>
+				sign_extend_p(31 downto 16) <= (others => '1');
+			  when others =>
+				sign_extend_p(31 downto 16) <= (others => '0');
+			end case;			
 			case instr(31 downto 26) is
 				when "100001" => --addi
 					alu_ctrl_p <= "010";
 				when "000010" => --beq
-					case instr(15) is
-						when '1' =>
-							sign_extend_p(15 downto 0)  <= instr(15 downto 0);
-							sign_extend_p(31 downto 16) <= (others => '1');
-						when others =>
-							sign_extend_p(15 downto 0)  <= instr(15 downto 0);
-							sign_extend_p(31 downto 16) <= (others => '0');
-					end case;
 				when "100000" => --lb
 				when "110000" => --sb
 				when others =>
@@ -136,17 +128,15 @@ port map(
 	end case;
 	end process;
 	
-	process(clk,rst,imm_p,reg_1data,reg_2data,reg_3_p,alu_ctrl_p,sign_extend_p,pc_addr_in)
+	process(clk,rst,reg_1data,reg_2data,reg_3_p,alu_ctrl_p,sign_extend_p,pc_addr_in)
 	begin
 		if rst='1' then
-			imm <= (others => '0');
 			reg_1_data <= (others => '0');
 			reg_2_data <= (others => '0');
 			alu_ctrl <= (others => '0');
 			alu_src <= '0';
 			sign_extend <= (others => '0');
 		elsif rising_edge(clk) then 
-			imm <= imm_p;
 			reg_1_data <= reg_1data;
 			reg_2_data <= reg_2data;
 			reg_3_addr <= reg_3_p;
