@@ -27,7 +27,9 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	pc_sel_out: out std_logic;
 	sign_extend : out std_logic_vector(31 downto 0);
 	alu_ctrl : out std_logic_vector(2 downto 0);
-	alu_src : out std_logic
+	alu_src : out std_logic;
+	wr_to_mem : out std_logic;
+	rd_from_mem : out std_logic
 );
 end instr_decode;
 
@@ -37,6 +39,8 @@ architecture behaviour of instr_decode is
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(31 downto 0);
 	signal alu_src_s, pc_sel_p : std_logic;
+	
+	signal wr_to_mem_s, rd_from_mem_s : std_logic;
 	
 component register_file is
 	port(
@@ -68,9 +72,19 @@ port map(
 		reg_2 => reg_2data
 	);
 	
+	
 	process(clk, instr) --should put all needed in here -----------------------------------------------
 	begin
+	
+	alu_ctrl_p <= (others => '0');
+	reg_1_p <= (others => '0');
+	reg_2_p <= (others => '0');
+	reg_3_p <= (others => '0');
+	sign_extend_p <= (others => '0');
 	pc_sel_p <= '0';
+	wr_to_mem_s <= '0';
+	rd_from_mem_s <= '0';
+	
 	case instr(31 downto 26) is
 		when "000000" => --register functions
 			-- read register 2 and 3 and get register write address
@@ -126,7 +140,9 @@ port map(
 				when "000010" => --beq
 					pc_sel_p <= '1' ;
 				when "100000" => --lb
+					rd_from_mem_s <= '1';
 				when "110000" => --sb
+					wr_to_mem_s <= '1'; 
 				when others =>
 			end case;
 	end case;
@@ -141,6 +157,8 @@ port map(
 			alu_src <= '0';
 			sign_extend <= (others => '0');
 			pc_sel_out <= '0';
+			wr_to_mem <= '0';
+			rd_from_mem <= '0';
 		elsif rising_edge(clk) then 
 			reg_1_data <= reg_1data;
 			reg_2_data <= reg_2data;
@@ -150,6 +168,8 @@ port map(
 			pc_addr_out <= pc_addr_in;
 			alu_src <= alu_src_s;
 			pc_sel_out <= pc_sel_p;
+			wr_to_mem <= wr_to_mem_s;
+			rd_from_mem <= rd_from_mem_s;
 		end if;
 	end process;
 end behaviour;
