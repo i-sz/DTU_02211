@@ -59,7 +59,9 @@ port(
 	pc_sel_out: out std_logic;
 	sign_extend : out std_logic_vector(31 downto 0);
 	alu_ctrl : out std_logic_vector(2 downto 0);
-	alu_src : out std_logic
+	alu_src : out std_logic;
+	wr_to_mem : out std_logic;
+	rd_from_mem : out std_logic
 );
 end component;
 
@@ -77,9 +79,13 @@ port(
 	pc_addr_in : in std_logic_vector(31 downto 0);
 	pc_sel_in : in std_logic;
 	alu_result : out std_logic_vector(31 downto 0);
-	ctrl : out std_logic_vector(2 downto 0);
 	pc_sel_out : out std_logic; -- controls the mux in IF
-	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
+	pc_address_out : out std_logic_vector(31 downto 0);  --input to the PC_ADDR mux
+	b_out : out std_logic_vector(31 downto 0);
+	wr_to_mem : in std_logic;
+	rd_from_mem : in std_logic;
+	memory_wr  : out std_logic;
+	memory_rd  : out std_logic
 	);
 end component;
 
@@ -87,11 +93,13 @@ component  memory_access is
 GENERIC ( MIPS_SIZE : NATURAL; RAM_SIZE	: NATURAL; ADDR_SIZE : NATURAL );
 port(
 	clk : in std_logic;
-	rst : in std_logic; 
+	rst : in std_logic;
+   wr  : in std_logic;
+	rd  : in std_logic;
+   reg3_addr_i : in  std_logic_vector(4 downto 0);
+	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb	
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_reg_in : in std_logic_vector(ADDR_SIZE-1 downto 0);
-	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
 );
@@ -101,7 +109,7 @@ component write_back is
 GENERIC ( MIPS_SIZE : NATURAL; ADDR_SIZE : NATURAL );
 port(
 	clk : in std_logic;
-	rst : in std_logic; 
+	rst : in std_logic;
 	rd_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	alu_result : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_reg_in  : in std_logic_vector(ADDR_SIZE-1 downto 0);
@@ -129,6 +137,8 @@ signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 signal wr_flag_s                       : std_logic;
 signal alu_src_s					   : std_logic;
+signal wr_to_mem_s, rd_from_mem_s : std_logic;
+
 
 
 
@@ -137,17 +147,19 @@ signal alu_src_s					   : std_logic;
 signal pc_addr_stage3                    : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal alu_output_s                      : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal ctrl_s                            : std_logic_vector(2 downto 0);
-signal jump_addr_s                       : std_logic_vector(7 downto 0);
-signal branch_out_s                      : std_logic_vector(7 downto 0);
+signal reg3_addr_ex_s,reg3_addr_ex_s1                : std_logic_vector(ADDR_SIZE-1 downto 0);
 signal reg3_addr_id_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
-signal reg3_addr_ex_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
+
 signal pc_sel_ss : std_logic;
+signal b_out_s : std_logic_vector(31 downto 0);
 	
 -- memory_access
 signal pc_addr_stage4                     : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal addr_s                             : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal rd_data_s                          : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal wr_reg_stage4                      : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal mem_wr                             : std_logic;
+signal mem_rd                             : std_logic;
 	
 -- write_back
 signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 0);
@@ -186,7 +198,9 @@ port map(
 	pc_sel_out => pc_sel_s,
 	sign_extend => sign_extend_s,
 	alu_ctrl => alu_ctrl_s,
-	alu_src => alu_src_s
+	alu_src => alu_src_s,
+	wr_to_mem => wr_to_mem_s,
+	rd_from_mem => rd_from_mem_s
 );			
 	
 execute_i : execute
@@ -203,22 +217,27 @@ port map(
 	pc_addr_in => pc_addr_stage2,
 	pc_sel_in =>  pc_sel_s,
 	alu_result => alu_output_s,
-	ctrl => ctrl_s,
 	pc_sel_out =>  pc_sel_ss,
-	pc_address_out => pc_addr_stage3
-	
+	pc_address_out => pc_addr_stage3,
+	b_out => b_out_s, --input to Memory_access
+	memory_wr => mem_wr,
+	memory_rd => mem_rd,
+	wr_to_mem => wr_to_mem_s,
+	rd_from_mem => rd_from_mem_s
 	);	
 
 memory_access_i : memory_access
 GENERIC Map (MIPS_SIZE,5,ADDR_SIZE)  
 port map(
 	clk => clock,
-	rst => reset, 
+	rst => reset,
+   wr => mem_wr,
+	rd => mem_rd,
+	reg3_addr_i => reg3_addr_ex_s,
+	reg3_addr_o => reg3_addr_ex_s1,
 	addr_in => alu_output_s, 
 	addr_out => addr_s,
-	wr_reg_in => branch_out_s(4 downto 0),
-	wr_reg_out => wr_reg_stage4,
-	wr_data => alu_output_s,
+	wr_data => b_out_s,
 	rd_data => rd_data_s
 	
 );
@@ -231,7 +250,7 @@ port map(
 	rst => reset,
 	rd_data => rd_data_s,
 	alu_result => addr_s,
-	wr_reg_in => wr_reg_stage4,
+	wr_reg_in => reg3_addr_ex_s1,
 	wr_reg_out => r3_addr_s,
 	wr_flag => wr_flag_s, 
 	wr_data => r3_data_s
