@@ -51,11 +51,12 @@ port(
 	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_flag    : in std_logic;
-        reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+	reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
 	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
 	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	pc_sel_out: out std_logic;
 	sign_extend : out std_logic_vector(31 downto 0);
 	alu_ctrl : out std_logic_vector(2 downto 0);
 	alu_src : out std_logic
@@ -127,7 +128,8 @@ signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 signal wr_flag_s                       : std_logic;
-signal alu_src_s								: std_logic;
+signal alu_src_s					   : std_logic;
+signal pc_sel_s						   : std_logic;
 
 
 
@@ -182,6 +184,7 @@ port map(
 	reg_3_addr => reg3_addr_id_s,  -- going to execution
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
+	pc_sel_out => pc_sel_s,
 	sign_extend => sign_extend_s,
 	alu_ctrl => alu_ctrl_s,
 	alu_src => alu_src_s
