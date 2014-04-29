@@ -1,4 +1,13 @@
 #################
+## VHDL stuff for this project
+#################
+
+output_files/
+outputt/
+mips/
+db/
+
+#################
 ## Eclipse
 #################
 
