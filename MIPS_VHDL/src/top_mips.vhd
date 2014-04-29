@@ -78,12 +78,11 @@ port(
 	pc_addr_in : in std_logic_vector(31 downto 0);
 	alu_result : out std_logic_vector(31 downto 0);
 	ctrl : out std_logic_vector(2 downto 0);
-	jump_instr : in std_logic_vector(7 downto 0);
-	jump_addr : out std_logic_vector(7 downto 0);
-	branch_out : out std_logic_vector(7 downto 0);
+	jump_addr_in : in std_logic_vector(31 downto 0); --jump address
+	jump_addr_out : out std_logic_vector(31 downto 0);
 	pc_sel : out std_logic; -- controls the mux in IF
 	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
-);
+	);
 end component;
 
 component  memory_access is
@@ -128,7 +127,7 @@ signal r1_s,r2_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r3_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
 signal r3_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal imm_s                           : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal jmp_addr_s                      : std_logic_vector(25 downto 0);
+signal jump_addr_s                      : std_logic_vector(25 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
@@ -209,9 +208,8 @@ port map(
 	pc_addr_in => pc_addr_stage2,
 	alu_result => alu_output_s,
 	ctrl => ctrl_s,
-	jump_instr => jmp_addr_s(7 downto 0),
-    jump_addr  => jump_addr_s,
-	branch_out => branch_out_s,
+   jump_addr_in  => jump_addr_s,
+	Jump_addr_out => ,
 	pc_sel => pc_sel_s,
 	pc_address_out => pc_addr_stage3
 	
