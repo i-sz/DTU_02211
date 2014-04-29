@@ -17,9 +17,13 @@ port(
 	pc_addr_in : in std_logic_vector(31 downto 0);
 	pc_sel_in : in std_logic;
 	alu_result : out std_logic_vector(31 downto 0);
-	ctrl : out std_logic_vector(2 downto 0);
 	pc_sel_out : out std_logic; -- controls the mux in IF
-	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
+	pc_address_out : out std_logic_vector(31 downto 0);	--input to the PC_ADDR mux
+	b_out : out std_logic_vector(31 downto 0);
+	wr_to_mem : in std_logic;
+	rd_from_mem : in std_logic;
+	memory_wr  : out std_logic;
+	memory_rd  : out std_logic
 );
 end execute;
 
@@ -60,7 +64,7 @@ port map(
 
 input_a <= A;
 input_b <= B when (alu_src ='0') else sign_extend;
-ctrl_p <= alu_ctrl;
+
 
 --Branching
 branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0)));  
@@ -71,17 +75,20 @@ process(clk,rst)
 begin
 	if  rst='1' then
 		alu_result <= (others => '0');
-		ctrl <= (others => '0');
 		reg3_addr_o <= (others => '0');
 		pc_sel_out <= '0';
 		pc_address_out <= (others => '0');
-
+		b_out <= (others => '0');
+      memory_wr  <= '0';
+		memory_rd  <= '0';
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
-		ctrl <= ctrl_p;
 		reg3_addr_o <= reg3_addr_i;
-		pc_address_out <= branch_address; --jump_or_branch_address
+		pc_address_out <= jump_or_branch_address; --jump_or_branch_address
 		pc_sel_out <= pc_sel_in;
+		b_out <= b;
+		memory_wr  <= wr_to_mem;
+		memory_rd  <= rd_from_mem;
 	end if;
 end process;	  
 		
