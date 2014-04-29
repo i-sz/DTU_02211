@@ -76,7 +76,6 @@ port(
 	pc_addr_in : in std_logic_vector(31 downto 0);
 	alu_result : out std_logic_vector(31 downto 0);
 	ctrl : out std_logic_vector(2 downto 0);
-	jump_addr_in : in std_logic_vector(31 downto 0); --jump address
 	jump_addr_out : out std_logic_vector(31 downto 0);
 	pc_sel : out std_logic; -- controls the mux in IF
 	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
