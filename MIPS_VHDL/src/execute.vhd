@@ -15,11 +15,10 @@ port(
 	alu_ctrl : in std_logic_vector(2 downto 0);
 	alu_src : in  std_logic;
 	pc_addr_in : in std_logic_vector(31 downto 0);
+	pc_sel_in : in std_logic;
 	alu_result : out std_logic_vector(31 downto 0);
 	ctrl : out std_logic_vector(2 downto 0);
-	jump_addr_in : in std_logic_vector(31 downto 0); --jump address
-	jump_addr_out : out std_logic_vector(31 downto 0);
-	pc_sel : out std_logic; -- controls the mux in IF
+	pc_sel_out : out std_logic; -- controls the mux in IF
 	pc_address_out : out std_logic_vector(31 downto 0)  --input to the PC_ADDR mux
 );
 end execute;
@@ -28,13 +27,11 @@ end execute;
 architecture behaviour of execute is
 
 signal input_a, input_b : std_logic_vector(31 downto 0);
-signal branch_address, jump_addr_p : std_logic_vector(31 downto 0);
+signal branch_address, jump_or_branch_address  : std_logic_vector(31 downto 0);
 --signals for the pipeline stage
 signal alu_result_p : std_logic_vector(31 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
 
-
-signal pc_sel_s : std_logic;
 
 
 
@@ -66,10 +63,8 @@ input_b <= B when (alu_src ='0') else sign_extend;
 ctrl_p <= alu_ctrl;
 
 --Branching
-branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0)));
-pc_sel_s <= '1' when (a = x"00000000") else '0';  
- --Jumping
-jump_addr_p <= jump_addr_in;
+branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0)));  
+jump_or_branch_address <= branch_address when (a = x"00000000") else sign_extend;
 
 --pipeline stage
 process(clk,rst)
@@ -77,18 +72,16 @@ begin
 	if  rst='1' then
 		alu_result <= (others => '0');
 		ctrl <= (others => '0');
-		jump_addr_out <= (others => '0');
 		reg3_addr_o <= (others => '0');
-		pc_sel <= '0';
+		pc_sel_out <= '0';
 		pc_address_out <= (others => '0');
 
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
 		ctrl <= ctrl_p;
-		jump_addr_out <= jump_addr_p;
 		reg3_addr_o <= reg3_addr_i;
-		pc_address_out <= branch_address;
-		pc_sel <= pc_sel_s;
+		pc_address_out <= branch_address; --jump_or_branch_address
+		pc_sel_out <= pc_sel_in;
 	end if;
 end process;	  
 		
