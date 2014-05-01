@@ -14,6 +14,7 @@
 # https://en.wikiversity.org/wiki/Computer_Architecture_Lab/SS2014/group_5_lab_2
 #
 
+import sys
 import re
 
 #Calculates two's complement from a binary string
@@ -166,6 +167,8 @@ def check_line(line):
     #Commented lines start with #
     if re.match("#", line):
         return False
+    elif re.match(";", line):
+        return False
     else:
         #Registry-type ops
         for reg in reg_types:
@@ -188,26 +191,36 @@ def check_line(line):
             return False
 
 #Main program
-print "Running..."
-#Read input file
-with open('IS.asm') as input_file:
-    #Open output file
-    output = open('output.bin', 'wb')
-    #Read file line by line
-    for line in input_file:
-        #Strip empty characters from left and right
-        binary = check_line(line.rstrip().lstrip())
-        #If there is no errors parsing code, output it
-        if binary != False:
-            if len(binary) == 32:
-                #Print output
-                print binary
-                #Write output to file
-                output.write(binary)
-            else:
-                print "Error!!"
-                exit(0)
-    #Close output file
-    output.close()
-#Program finished
-print "Finished"
+def main(argv):
+    if (len(argv) == 0):
+        print "Give assembly file as a parameter"
+        exit(0)
+    print "Running with file " + str(argv[0]) + "..."
+    #Read input file
+    with open(argv[0]) as input_file:
+        #Open output file
+        output = open(input_file.name.rsplit(".", 1)[0] + ".bin", 'wb')
+        output_lines = open(input_file.name.rsplit(".", 1)[0] + "_lines.bin", 'wb')
+        #Read file line by line
+        for line in input_file:
+            #Strip empty characters from left and right
+            binary = check_line(line.rstrip().lstrip())
+            #If there is no errors parsing code, output it
+            if binary != False:
+                if len(binary) == 32:
+                    #Print output
+                    print binary
+                    #Write output to file
+                    output.write(binary)
+                    output_lines.write(binary+"\n")
+                else:
+                    print "Error!!"
+                    exit(0)
+        #Close output file
+        output.close()
+    #Program finished
+    print "Finished"
+
+# Run main
+if __name__ == "__main__":
+    main(sys.argv[1:])
