@@ -20,13 +20,12 @@ entity top_mips is
 GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 port(
 	clock : in std_logic;
-	reset : in std_logic;
-	uart_wr_ena : out std_logic;
-   uart_rd_ena : out  std_logic;
-   uart_addr   : out  std_logic_vector(4 downto 0);
-   uart_wr_data: out std_logic_vector(31 downto 0);
-   uart_rd_data: in std_logic_vector(31 downto 0);
-	uart_rdy_cnt : in std_logic_vector(1 downto 0)
+	reset : in std_logic
+	--wr_ena : out std_logic;
+    --rd_ena : out  std_logic;
+    --addr_adapter   : out  std_logic_vector(4 downto 0);
+    --data_out    : out std_logic_vector(31 downto 0);
+    --data_in     : in std_logic_vector(31 downto 0)
 );
 end top_mips;
 
@@ -50,12 +49,12 @@ port(
 	clk : in std_logic;
 	rst : in std_logic;
 	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_3_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_flag    : in std_logic;
-	reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
-	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
-	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
+	reg1_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+	reg1_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
+	reg_1_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_sel_out: out std_logic;
@@ -131,9 +130,9 @@ signal instr_s                         : std_logic_vector(MIPS_SIZE-1 downto 0);
 
 -- Instr_decode
 signal wr_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal r1_s,r2_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
-signal r3_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
-signal r3_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
+signal r2_s,r3_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
+signal r1_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal r1_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
@@ -149,8 +148,8 @@ signal wr_to_mem_s, rd_from_mem_s : std_logic;
 signal pc_addr_stage3                    : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal alu_output_s                      : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal ctrl_s                            : std_logic_vector(2 downto 0);
-signal reg3_addr_ex_s,reg3_addr_ex_s1                : std_logic_vector(ADDR_SIZE-1 downto 0);
-signal reg3_addr_id_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal reg1_addr_ex_s,reg1_addr_ex_s1                : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal reg1_addr_id_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
 
 signal pc_sel_ss : std_logic;
 signal b_out_s : std_logic_vector(31 downto 0);
@@ -189,12 +188,12 @@ port map(
 	clk => clock,
 	rst => reset,
 	instr => instr_s,
-	reg_1_data => r1_s,
 	reg_2_data => r2_s,
+	reg_3_data => r3_s,
 	wr_flag => wr_flag_s, 
-	reg3_wb_addr => r3_addr_s, -- coming from wb
-	reg3_wb_data => r3_data_s, -- coming from wb
-	reg_3_addr => reg3_addr_id_s,  -- going to execution
+	reg1_wb_addr => r1_addr_s, -- coming from wb
+	reg1_wb_data => r1_data_s, -- coming from wb
+	reg_1_addr => reg1_addr_id_s,  -- going to execution
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
 	pc_sel_out => pc_sel_s,
@@ -209,10 +208,10 @@ execute_i : execute
 port map(
 	clk => clock,
 	rst => reset,
-	a => r1_s,
-	b => r2_s,
-	reg3_addr_i => reg3_addr_id_s,
-	reg3_addr_o => reg3_addr_ex_s,
+	a => r2_s,
+	b => r3_s,
+	reg3_addr_i => reg1_addr_id_s,
+	reg3_addr_o => reg1_addr_ex_s,
 	sign_extend => sign_extend_s,
 	alu_ctrl => alu_ctrl_s,
 	alu_src => alu_src_s,
@@ -235,8 +234,8 @@ port map(
 	rst => reset,
    wr => mem_wr,
 	rd => mem_rd,
-	reg3_addr_i => reg3_addr_ex_s,
-	reg3_addr_o => reg3_addr_ex_s1,
+	reg3_addr_i => reg1_addr_ex_s,
+	reg3_addr_o => reg1_addr_ex_s1,
 	addr_in => alu_output_s, 
 	addr_out => addr_s,
 	wr_data => b_out_s,
@@ -252,10 +251,10 @@ port map(
 	rst => reset,
 	rd_data => rd_data_s,
 	alu_result => addr_s,
-	wr_reg_in => reg3_addr_ex_s1,
-	wr_reg_out => r3_addr_s,
+	wr_reg_in => reg1_addr_ex_s1,
+	wr_reg_out => r1_addr_s,
 	wr_flag => wr_flag_s, 
-	wr_data => r3_data_s
+	wr_data => r1_data_s
 
 );
 	
