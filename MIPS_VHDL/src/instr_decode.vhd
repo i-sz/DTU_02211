@@ -16,12 +16,12 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	clk : in std_logic;
 	rst : in std_logic;
 	instr : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	reg_1_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	reg_2_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	reg_3_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_flag    : in std_logic;
-	reg3_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
-	reg3_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
-	reg_3_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
+	reg1_wb_addr : in std_logic_vector(ADDR_SIZE-1 downto 0);  -- Reg3 addr From Write back
+	reg1_wb_data : in std_logic_vector(MIPS_SIZE-1 downto 0);-- Reg3 data From Write back 	
+	reg_1_addr : out std_logic_vector(ADDR_SIZE-1 downto 0); -- forwarded reg3 address
 	pc_addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	pc_sel_out: out std_logic;
@@ -35,7 +35,7 @@ end instr_decode;
 
 architecture behaviour of instr_decode is
 	signal reg_1_p, reg_2_p, reg_3_p : std_logic_vector(ADDR_SIZE-1 downto 0);
-	signal reg_1data,reg_2data : std_logic_vector(MIPS_SIZE-1 downto 0);
+	signal reg_2data,reg_3data : std_logic_vector(MIPS_SIZE-1 downto 0);
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(31 downto 0);
 	signal alu_src_s, pc_sel_p : std_logic;
@@ -64,12 +64,12 @@ port map(
 		clk => clk,
 		rst => rst,
 		rw  => wr_flag,
-		r1_addr	=> reg_1_p,
-		r2_addr	=> reg_2_p,
-		r3_addr	=> reg3_wb_addr,
-		wr_data => reg3_wb_data,
-		reg_1 => reg_1data, 
-		reg_2 => reg_2data
+		r1_addr	=> reg_2_p,
+		r2_addr	=> reg_3_p,
+		r3_addr	=> reg1_wb_addr,
+		wr_data => reg1_wb_data,
+		reg_1 => reg_2data, 
+		reg_2 => reg_3data
 	);
 	
 	
@@ -148,11 +148,11 @@ port map(
 	end case;
 	end process;
 	
-	process(clk,rst,reg_1data,reg_2data,reg_3_p,alu_ctrl_p,sign_extend_p,pc_addr_in)
+	process(clk,rst,reg_2data,reg_3data,reg_1_p,alu_ctrl_p,sign_extend_p,pc_addr_in)
 	begin
 		if rst='1' then
-			reg_1_data <= (others => '0');
 			reg_2_data <= (others => '0');
+			reg_3_data <= (others => '0');
 			alu_ctrl <= (others => '0');
 			alu_src <= '0';
 			sign_extend <= (others => '0');
@@ -160,9 +160,9 @@ port map(
 			wr_to_mem <= '0';
 			rd_from_mem <= '0';
 		elsif rising_edge(clk) then 
-			reg_1_data <= reg_1data;
 			reg_2_data <= reg_2data;
-			reg_3_addr <= reg_3_p;
+			reg_3_data <= reg_3data;
+			reg_1_addr <= reg_1_p;
 			alu_ctrl <= alu_ctrl_p;
 			sign_extend <= sign_extend_p;
 			pc_addr_out <= pc_addr_in;
