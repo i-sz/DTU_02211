@@ -56,6 +56,7 @@ if rising_edge(clk) then
         to_proc_data_in <=  uart_rd_data   
         to_proc_rd_ena  <= '1' ;  
         uart_rd_ena <='1';
+        uart_addr <= "00";
    end if;
 end if; 
         
