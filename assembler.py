@@ -159,12 +159,12 @@ def parse_jmp(line):
     return binary
 
 #Check line operation type
-def check_line(line):
+def parse_line(line):
     reg_types=["add", "sub", "mult", "div", "and", "or", "slt", "srl", "slr"]
     imm_types=["addi", "beq", "lb", "sb"]
     jmp_types=["jmp"]
 
-    #Commented lines start with #
+    #Commented lines start with # or ;
     if re.match("#", line):
         return False
     elif re.match(";", line):
@@ -204,15 +204,15 @@ def main(argv):
         #Read file line by line
         for line in input_file:
             #Strip empty characters from left and right
-            binary = check_line(line.rstrip().lstrip())
+            binary = parse_line(line.rstrip().lstrip())
             #If there is no errors parsing code, output it
             if binary != False:
                 if len(binary) == 32:
                     #Print output
-                    print binary
+                    print binary + " - " + str(line.rstrip().lstrip())
                     #Write output to file
                     output.write(binary)
-                    output_lines.write(binary+"\n")
+                    output_lines.write("\"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
                 else:
                     print "Error!!"
                     exit(0)
