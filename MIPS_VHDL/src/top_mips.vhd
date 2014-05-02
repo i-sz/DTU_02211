@@ -258,7 +258,7 @@ port map(
 
 );
 	
-   --wr_ena <= mem_wr;
+    --wr_ena <= mem_wr;
     --rd_ena <= mem_rd;
     --addr_adapter <= alu_output_s;
     --data_out <= b_out_s;
