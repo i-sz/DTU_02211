@@ -20,11 +20,13 @@ entity top_mips is
 GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 port(
 	clock : in std_logic;
-	reset : in std_logic
--- uart_wr_ena : in std_logic;
--- rd_ena : in  
---	uart_tx : out std_logic;
---	uart_rx : in std_logic
+	reset : in std_logic;
+	uart_wr_ena : out std_logic;
+   uart_rd_ena : out  std_logic;
+   uart_addr   : out  std_logic_vector(4 downto 0);
+   uart_wr_data: out std_logic_vector(31 downto 0);
+   uart_rd_data: in std_logic_vector(31 downto 0);
+	uart_rdy_cnt : in std_logic_vector(1 downto 0)
 );
 end top_mips;
 
