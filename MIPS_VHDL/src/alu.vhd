@@ -14,7 +14,7 @@ architecture behaviour of alu is
 signal output64  : std_logic_vector(63 downto 0);
 
 begin
-
+output64 <= (others => '0');
 process(input_a, input_b, ctrl)
 begin
 	case ctrl is
