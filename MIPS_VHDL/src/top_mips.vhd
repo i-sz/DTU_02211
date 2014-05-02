@@ -232,7 +232,7 @@ GENERIC Map (MIPS_SIZE,5,ADDR_SIZE)
 port map(
 	clk => clock,
 	rst => reset,
-   wr => mem_wr,
+    wr => mem_wr,
 	rd => mem_rd,
 	reg3_addr_i => reg1_addr_ex_s,
 	reg3_addr_o => reg1_addr_ex_s1,
@@ -258,7 +258,11 @@ port map(
 
 );
 	
-
+   --wr_ena <= mem_wr;
+    --rd_ena <= mem_rd;
+    --addr_adapter <= alu_output_s;
+    --data_out <= b_out_s;
+    --data_in <= ;
 
    	
 end structural;
