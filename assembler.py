@@ -85,30 +85,34 @@ def convert_dst(dst):
 def parse_reg(line):
     parts = line.split(" ")
     op = parts[0]
-    regs = parts[1].split(",")
     shift_binary = "00000"
     op_binary = "000000"
-    if re.search("add", op):
-        funct_binary = "100000"
-    elif re.search("sub", op):
-        funct_binary = "100010"
-    elif re.search("mult", op):
-        funct_binary = "100100"
-    elif re.search("div", op):
-        funct_binary = "100101"
-    elif re.search("and", op):
-        funct_binary = "101000"
-    elif re.search("or", op):
-        funct_binary = "101001"
-    elif re.search("slt", op):
-        funct_binary = "110100"
-    elif re.search("srl", op):
-        funct_binary = "111000"
-    elif re.search("slr", op):
-        funct_binary = "111001"
+    if re.search("nop", op):
+        funct_binary = "000000"
+        reg_binary = "000000000000000"
     else:
-        funct_binary = False
-    reg_binary = convert_regs(regs)
+        regs = parts[1].split(",")
+        if re.search("add", op):
+            funct_binary = "100000"
+        elif re.search("sub", op):
+            funct_binary = "100010"
+        elif re.search("mult", op):
+            funct_binary = "100100"
+        elif re.search("div", op):
+            funct_binary = "100101"
+        elif re.search("and", op):
+            funct_binary = "101000"
+        elif re.search("or", op):
+            funct_binary = "101001"
+        elif re.search("slt", op):
+            funct_binary = "110100"
+        elif re.search("srl", op):
+            funct_binary = "111000"
+        elif re.search("slr", op):
+            funct_binary = "111001"
+        else:
+            funct_binary = False
+        reg_binary = convert_regs(regs)
     if reg_binary == False or funct_binary == False:
         return False
     else:
@@ -160,7 +164,7 @@ def parse_jmp(line):
 
 #Check line operation type
 def parse_line(line):
-    reg_types=["add", "sub", "mult", "div", "and", "or", "slt", "srl", "slr"]
+    reg_types=["add", "sub", "mult", "div", "and", "or", "slt", "srl", "slr", "nop"]
     imm_types=["addi", "beq", "lb", "sb"]
     jmp_types=["jmp"]
 
@@ -172,7 +176,7 @@ def parse_line(line):
     else:
         #Registry-type ops
         for reg in reg_types:
-            if re.search(reg+"\s", line):
+            if re.search(reg+"\s", line) or re.search(reg+"$", line):
                 binary = parse_reg(line)
         #Immediate-type ops
         for imm in imm_types:
@@ -209,9 +213,9 @@ def main(argv):
             if binary != False:
                 if len(binary) == 32:
                     #Print output
-                    print binary + " - " + str(line.rstrip().lstrip())
+                    print "\"" + binary + "\"; -- " + str(line.rstrip().lstrip())
                     #Write output to file
-                    output.write(binary)
+                    #output.write(binary)
                     output_lines.write("\"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
                 else:
                     print "Error!!"
