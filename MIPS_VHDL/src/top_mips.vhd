@@ -166,6 +166,7 @@ signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 
 
 --uart adapter signals
 signal uart_rd_ena_s								: std_logic;
+signal data_in_s									: std_logic_vector(31 downto 0);	
 
 	
 BEGIN
@@ -262,10 +263,9 @@ port map(
 
 	
     wr_ena <= mem_wr;
-    uart_rd_ena <= uart_rd_ena_s;
-    addr_adapter <= alu_output_s;
+    addr_adapter <= alu_output_s(4 downto 0);
     data_out <= b_out_s;
-    data_in <= ;
+    data_in_s <= data_in;
 
    	
 end structural;
