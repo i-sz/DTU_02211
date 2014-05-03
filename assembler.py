@@ -273,10 +273,10 @@ def main(argv):
                         cmdLineNumber = cmdLineNumber + 1
                         #Print output
                         if firstRun == False:
-                            print "\"" + binary + "\"; -- " + str(line.rstrip().lstrip())
+                            print "       when 4*" + str(cmdLineNumber-1) + "   => data <= \"" + binary + "\"; -- " + str(line.rstrip().lstrip())
                             #Write output to file
                             #output.write(binary)
-                            output_lines.write("\"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
+                            output_lines.write("       when 4*" + str(cmdLineNumber-1) + "   => data <= \"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
                     else:
                         print "Error!!"
                         exit(0)

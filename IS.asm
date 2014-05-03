@@ -31,18 +31,20 @@ slt r03,r02,r01
 addi r01,r00,0
 
 addi r02,r00,1
-
-beq r01,r02,3
+LOOP1:
+beq r01,r02,ENDLOOP1
 
 addi r01,r01,1
 
-jmp -2
+jmp LOOP1
+
+ENDLOOP1:
 
 addi r01,r01,-1
 
-sb r04,r00,255
+sb r04,r00,2
 
-lb r04,r00,255
+lb r04,r00,2
 
 
 
