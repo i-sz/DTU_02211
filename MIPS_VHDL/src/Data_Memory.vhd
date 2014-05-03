@@ -27,7 +27,7 @@ ARCHITECTURE rtl OF Data_Memory IS
 	TYPE RAM IS ARRAY(2**RAM_SIZE-1 DOWNTO 0) OF std_logic_vector(MIPS_SIZE - 1 DOWNTO 0);   
 	SIGNAL block_ram : RAM;
 BEGIN
-	PROCESS (rst,ramdata_in,addr,ram_write,ram_read)
+	PROCESS (clk, rst,ramdata_in,addr,ram_write,ram_read)
 	BEGIN
 		IF (rst = '1') THEN --- reset---
 		   for j in 0 to 2**RAM_SIZE-1 loop
