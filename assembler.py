@@ -276,7 +276,11 @@ def main(argv):
                             print "       when 4*" + str(cmdLineNumber-1) + "   => data <= \"" + binary + "\"; -- " + str(line.rstrip().lstrip())
                             #Write output to file
                             #output.write(binary)
-                            output_lines.write("       when 4*" + str(cmdLineNumber-1) + "   => data <= \"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
+                            if (cmdLineNumber-1) < 10:
+                                space = " "
+                            else:
+                                space = ""
+                            output_lines.write("       when 4*" + str(cmdLineNumber-1) + "   "+space+"=> data <= \"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
                     else:
                         print "Error!!"
                         exit(0)
