@@ -10,7 +10,7 @@ ENTITY Data_Memory IS
 		RAM_SIZE	    : NATURAL := 5
 	);
 	PORT
-	(
+	(   clk : in std_logic;
 		rst			    : IN  std_logic;                                    --- rst
 		ramdata_in		: IN  std_logic_vector(MIPS_SIZE - 1 DOWNTO 0);     --- data input to RAM 
 		addr	        : IN  std_logic_vector(MIPS_SIZE - 1 DOWNTO 0);     --- address input
@@ -33,14 +33,16 @@ BEGIN
 		   for j in 0 to 2**RAM_SIZE-1 loop
 					block_ram(j) <= (others => '1');
 		    end loop;
-		----write----
-		elsif (ram_write = '1' and ram_read = '0') THEN
-			block_ram(to_integer(unsigned(addr(4 downto 0)))) <= ramdata_in;
-			ramdata_out <= (others => '0');
-        ----read----
-		elsif (ram_write = '0' and ram_read = '1') THEN
-			ramdata_out <= block_ram(to_integer(unsigned(addr(4 downto 0))));
-		END IF;
+		elsif rising_edge(clk) then
+			----write----
+			if (ram_write = '1' and ram_read = '0') THEN
+				block_ram(to_integer(unsigned(addr(4 downto 0)))) <= ramdata_in;
+				ramdata_out <= (others => '0');
+			----read----
+			elsif (ram_write = '0' and ram_read = '1') THEN
+				ramdata_out <= block_ram(to_integer(unsigned(addr(4 downto 0))));
+			END IF;
+		END IF;	
 	END PROCESS;
 	
 	
