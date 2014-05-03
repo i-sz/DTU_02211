@@ -13,6 +13,7 @@ port(
 	clock : in std_logic;
 	reset : in std_logic;
 	wr_ena : out std_logic;
+    rd_ena : out std_logic;
     uart_rd_ena : in  std_logic;
     addr_adapter   : out  std_logic_vector(4 downto 0);
     data_out    : out std_logic_vector(31 downto 0);
@@ -33,10 +34,10 @@ top_mips_i : top_mips
 		clock => clk,
 		reset => reset,
         wr_ena => wr_ena_s,
-        uart_rd_ena => '0',
+        uart_rd_ena => '1',
         addr_adapter => addr_adapter_s,
         data_out => data_out_s,
-        data_in => (others =>'0')
+        data_in => "10000101001000000000000001110010"
 	);
 	
     clk_proc: process

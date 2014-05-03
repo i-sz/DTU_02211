@@ -9,19 +9,19 @@ entity Instr_Memory is
 end Instr_Memory;
 
 architecture behavioral of Instr_Memory is
-signal addr : integer range 0 to 4*31;  
+signal addr : integer range 0 to 4*509;  
  
 begin
 addr <= to_integer(unsigned(address));
    process(addr) 
 	begin
       case addr is 
-	   when 4*0    => data <= "10000000001000000000000000000001"; -- lb r01,r00,1
-       when 4*1    => data <= "10000000010000000000000000000001"; -- lb r02,r00,1
-       when 4*2    => data <= "10000000011000000000000000000001"; -- lb r03,r00,1
-       when 4*3    => data <= "10000000100000000000000000000001"; -- lb r04,r00,1
-       when 4*4    => data <= "10000000101000000000000000000001"; -- lb r05,r00,1
-       when 4*5    => data <= "10000000110000000000000000000001"; -- lb r06,r00,1
+	   when 4*0    => data <= "10000100001000000000000001001000"; -- addi r01,r00,72
+       when 4*1    => data <= "10000100010000000000000001100101"; -- addi r02,r00,101
+       when 4*2    => data <= "10000100011000000000000001101100"; -- addi r03,r00,108
+       when 4*3    => data <= "10000100100000000000000001101100"; -- addi r04,r00,108
+       when 4*4    => data <= "10000100101000000000000001101111"; -- addi r05,r00,111
+       when 4*5    => data <= "10000100110000000000000000100000"; -- addi r06,r00,32
        when 4*6    => data <= "10000100111000000000000001110111"; -- addi r07,r00,119
        when 4*7    => data <= "10000101000000000000000001101111"; -- addi r08,r00,111
        when 4*8    => data <= "10000101001000000000000001110010"; -- addi r09,r00,114

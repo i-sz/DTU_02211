@@ -12,7 +12,8 @@ port(
     rst : in std_logic;
 
 -- processor interface
-    mem_wr_ena       : in std_logic;   -- write enable to memory at execute stage
+    mem_rd_ena       : in std_logic;
+	mem_wr_ena       : in std_logic;   -- write enable to memory at execute stage
     mem_data_in      : in std_logic_vector(31 downto 0); -- write_data to memeory from execute stage 
     to_proc_data_in  : out  std_logic_vector(31 downto 0);  --uart data to processor   
     to_proc_rd_ena   : out std_logic;   --rd_ena to the processor to know when the readout happened
@@ -33,7 +34,7 @@ architecture behav of uart_adapter is
 
 
 begin
-process(clk, mem_wr_ena, mem_data_in, mem_address, uart_rdy_cnt)
+process(clk, mem_wr_ena, mem_data_in, mem_address, uart_rdy_cnt,mem_rd_ena)
 begin
 
 if rising_edge(clk) then
@@ -53,14 +54,16 @@ if rising_edge(clk) then
     to_proc_data_in <= (others => '0');     
     to_proc_rd_ena <= '0';
     uart_addr <= "01";
-    if mem_address(0) = '1' then
-        uart_rd_ena <='1';
-        uart_addr <= "00";
-        if (uart_rdy_cnt = "00") then
-            to_proc_data_in <=  uart_rd_data; 
-				to_proc_rd_ena <='1';      
+	if mem_rd_ena = '1' then
+     	if mem_address(0) = '1' then
+			uart_rd_ena <='1';
+			uart_addr <= "00";
+			if (uart_rdy_cnt = "00") then
+				to_proc_data_in <=  uart_rd_data; 
+					to_proc_rd_ena <='1';      
 			end if;
-	end if;		
+		end if;	
+    end if;		
 end if; 
         
 end process;

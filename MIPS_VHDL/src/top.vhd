@@ -23,6 +23,7 @@ port(
 	clock : in std_logic;
 	reset : in std_logic;
 	wr_ena : out std_logic;
+	rd_ena : out std_logic;
    uart_rd_ena : in  std_logic;
    addr_adapter   : out  std_logic_vector(4 downto 0);
    data_out    : out std_logic_vector(31 downto 0);
@@ -67,6 +68,7 @@ port(
     rst : in std_logic;
 
 -- processor interface
+    mem_rd_ena       : in std_logic;
     mem_wr_ena       : in std_logic;   -- write enable to memory at execute stage
     mem_data_in      : in std_logic_vector(31 downto 0); -- write_data to memeory from execute stage 
     to_proc_data_in  : out  std_logic_vector(31 downto 0);  --uart data to processor   
@@ -86,7 +88,7 @@ end component;
 
 
 --signals from mips to uart adapter
-signal wr_ena_s, to_proc_rd_ena_s : std_logic;
+signal wr_ena_s, to_proc_rd_ena_s,rd_ena_s : std_logic;
 signal mem_data_out_s, mem_data_in_s : std_logic_vector(31 downto 0);
 signal mem_address_s :  std_logic_vector(4 downto 0);
 
@@ -121,7 +123,8 @@ rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
     (
       clock => clk,
 	   reset => rst,
-      wr_ena => wr_ena_s, 
+        wr_ena => wr_ena_s, 
+		rd_ena => rd_ena_s,
 		uart_rd_ena => to_proc_rd_ena_s,
 		addr_adapter => mem_address_s,  
 		data_out  => mem_data_out_s,  
@@ -139,6 +142,7 @@ rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
     rst => rst,
 
 -- processor interface
+    mem_rd_ena => rd_ena_s, 
     mem_wr_ena  => wr_ena_s,     
     mem_data_in =>  mem_data_out_s,     
     to_proc_data_in  =>  mem_data_in_s,

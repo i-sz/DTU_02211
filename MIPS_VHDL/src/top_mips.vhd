@@ -22,6 +22,7 @@ port(
 	clock : in std_logic;
 	reset : in std_logic;
 	wr_ena : out std_logic;
+	rd_ena : out std_logic;
    uart_rd_ena : in  std_logic;
    addr_adapter   : out  std_logic_vector(4 downto 0);
    data_out    : out std_logic_vector(31 downto 0);
@@ -261,11 +262,12 @@ port map(
 
 );
 	
+	rd_ena  <= mem_rd;
     wr_ena <= mem_wr;
     addr_adapter <= alu_output_s(4 downto 0);
     data_out <= b_out_s;
     data_in_s <= data_in when (uart_rd_ena='1') else r1_data_s;
-    addr_in_s <= "00001" when (uart_rd_ena='1') else r1_addr_s;
+    addr_in_s <= r1_addr_s;
 	wr_flag_s <= uart_rd_ena or wb_ena_s;
    	
 end structural;
