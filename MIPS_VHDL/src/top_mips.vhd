@@ -20,12 +20,12 @@ entity top_mips is
 GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 port(
 	clock : in std_logic;
-	reset : in std_logic
-	--wr_ena : out std_logic;
-    --rd_ena : out  std_logic;
-    --addr_adapter   : out  std_logic_vector(4 downto 0);
-    --data_out    : out std_logic_vector(31 downto 0);
-    --data_in     : in std_logic_vector(31 downto 0)
+	reset : in std_logic;
+	wr_ena : out std_logic;
+   uart_rd_ena : out  std_logic;
+   addr_adapter   : out  std_logic_vector(4 downto 0);
+   data_out    : out std_logic_vector(31 downto 0);
+   data_in     : in std_logic_vector(31 downto 0)
 );
 end top_mips;
 
@@ -121,7 +121,6 @@ port(
 );
 end component;
 
-
 --------internal signals-------
 -- Instr_Fetch	
 signal pc_sel_s                        : std_logic;
@@ -165,6 +164,8 @@ signal mem_rd                             : std_logic;
 -- write_back
 signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 0);
 
+--uart adapter signals
+signal uart_rd_ena_s								: std_logic;
 
 	
 BEGIN
@@ -257,12 +258,14 @@ port map(
 	wr_data => r1_data_s
 
 );
+
+
 	
-    --wr_ena <= mem_wr;
-    --rd_ena <= mem_rd;
-    --addr_adapter <= alu_output_s;
-    --data_out <= b_out_s;
-    --data_in <= ;
+    wr_ena <= mem_wr;
+    uart_rd_ena <= uart_rd_ena_s;
+    addr_adapter <= alu_output_s;
+    data_out <= b_out_s;
+    data_in <= ;
 
    	
 end structural;
