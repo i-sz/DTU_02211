@@ -14,9 +14,10 @@ architecture behaviour of alu is
 signal output64  : std_logic_vector(63 downto 0);
 
 begin
-output64 <= (others => '0');
-process(input_a, input_b, ctrl)
+
+process(input_a, input_b, ctrl, output64)
 begin
+output64 <= (others => '0');
 	case ctrl is
 		when "000" => output <= std_logic_vector(unsigned(input_a) and unsigned(input_b));
 		when "001" => output <= std_logic_vector(unsigned(input_a) or unsigned(input_b));
