@@ -23,8 +23,8 @@ port(
     uart_rd_ena    : out  std_logic;
     uart_addr      : out  std_logic_vector(1 downto 0);
     uart_wr_data   : out std_logic_vector(31 downto 0);
-    uart_rd_data   : in std_logic_vector(31 downto 0)
---	uart_rdy_cnt : in std_logic_vector(1 downto 0)
+    uart_rd_data   : in std_logic_vector(31 downto 0);
+	uart_rdy_cnt : in std_logic_vector(1 downto 0)
 );
 
 architecture behav of uart_adapater is
@@ -32,13 +32,13 @@ architecture behav of uart_adapater is
 
 
 begin
-process(clk, mem_wr_ena, mem_data_in, mem_address)
+process(clk, mem_wr_ena, mem_data_in, mem_address, uart_rdy_cnt)
 begin
 
 if rising_edge(clk) then
     uart_wr_data <= (others => '0');
     uart_wr_ena <= '0';
-    if mem_wr_ena = '0' then
+    if mem_wr_ena = '1' then
         if mem_address(0) = '0' then
             uart_wr_data <= mem_data_in;
             uart_wr_ena <= '1'; 
@@ -53,10 +53,11 @@ if rising_edge(clk) then
     to_proc_rd_ena <= '0';
     uart_addr <= "01";
     if mem_address(0) = '1' then
-        to_proc_data_in <=  uart_rd_data   
-        to_proc_rd_ena  <= '1' ;  
         uart_rd_ena <='1';
         uart_addr <= "00";
+        if (uart_rdy_cnt = "00")
+            to_proc_data_in <=  uart_rd_data; 
+            to_proc_rd_ena <='1';      
    end if;
 end if; 
         
