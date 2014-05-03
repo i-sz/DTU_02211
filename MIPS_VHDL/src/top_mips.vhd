@@ -22,7 +22,7 @@ port(
 	clock : in std_logic;
 	reset : in std_logic;
 	wr_ena : out std_logic;
-   uart_rd_ena : out  std_logic;
+   uart_rd_ena : in  std_logic;
    addr_adapter   : out  std_logic_vector(4 downto 0);
    data_out    : out std_logic_vector(31 downto 0);
    data_in     : in std_logic_vector(31 downto 0)
