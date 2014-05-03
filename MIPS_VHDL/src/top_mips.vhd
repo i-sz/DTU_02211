@@ -261,9 +261,9 @@ port map(
 
 );
 	
-    wr_ena <= wr_to_mem_s;
-    addr_adapter <= b_out_s(4 downto 0);
-    data_out <= alu_output_s;
+    wr_ena <= mem_wr;
+    addr_adapter <= alu_output_s(4 downto 0);
+    data_out <= b_out_s;
     data_in_s <= data_in when (uart_rd_ena='1') else r1_data_s;
     addr_in_s <= "00001" when (uart_rd_ena='1') else r1_addr_s;
 	wr_flag_s <= uart_rd_ena or wb_ena_s;
