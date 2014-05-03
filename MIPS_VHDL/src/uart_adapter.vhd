@@ -28,7 +28,7 @@ port(
 );
 end uart_adapter;
 
-architecture behav of uart_adapater is
+architecture behav of uart_adapter is
 
 
 
