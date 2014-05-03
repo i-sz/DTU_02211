@@ -135,7 +135,7 @@ signal r1_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
-signal wr_flag_s                       : std_logic;
+signal wr_flag_s,wb_ena_s              : std_logic;
 signal alu_src_s					   : std_logic;
 signal wr_to_mem_s, rd_from_mem_s : std_logic;
 
@@ -167,6 +167,7 @@ signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 
 --uart adapter signals
 signal uart_rd_ena_s								: std_logic;
 signal data_in_s									: std_logic_vector(31 downto 0);	
+signal addr_in_s                      : std_logic_vector(ADDR_SIZE-1 downto 0);
 
 	
 BEGIN
@@ -193,8 +194,8 @@ port map(
 	reg_2_data => r2_s,
 	reg_3_data => r3_s,
 	wr_flag => wr_flag_s, 
-	reg1_wb_addr => r1_addr_s, -- coming from wb
-	reg1_wb_data => r1_data_s, -- coming from wb
+	reg1_wb_addr => addr_in_s, -- coming from wb r1_addr_s
+	reg1_wb_data => data_in_s, -- coming from wb r1_data_s
 	reg_1_addr => reg1_addr_id_s,  -- going to execution
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
@@ -255,17 +256,16 @@ port map(
 	alu_result => addr_s,
 	wr_reg_in => reg1_addr_ex_s1,
 	wr_reg_out => r1_addr_s,
-	wr_flag => wr_flag_s, 
+	wr_flag => wb_ena_s, 
 	wr_data => r1_data_s
 
 );
-
-
 	
-    wr_ena <= mem_wr;
-    addr_adapter <= alu_output_s(4 downto 0);
-    data_out <= b_out_s;
-    data_in_s <= data_in;
-
+    wr_ena <= wr_to_mem_s;
+    addr_adapter <= b_out_s(4 downto 0);
+    data_out <= alu_output_s;
+    data_in_s <= data_in when (uart_rd_ena='1') else r1_data_s;
+    addr_in_s <= "00001" when (uart_rd_ena='1') else r1_addr_s;
+	wr_flag_s <= uart_rd_ena or wb_ena_s;
    	
 end structural;
