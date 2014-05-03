@@ -19,7 +19,7 @@ addi r01,r00,0
 ;Read loop start
 ;Read from UART
 READUART:
-ld r10,r00,1
+lb r10,r00,1
 
 nop
 nop
@@ -90,7 +90,7 @@ nop
 ; addi r03,r00,13
 ; ;# GETLENGTH
 ; ;# Read from counter point mem
-; ld r02,r01,00
+; lb r02,r01,00
 ; ;# Skip to READANDREVERSE if Carriage return
 ; beq r02,r03,3
 ; ;# Increase counter r01
@@ -107,7 +107,7 @@ nop
 ; ;#start position for mem in r04 anr r05
 ; ;#READWRITE
 ; ; Load from the end of the string to r10 (r01 is the last char at first)
-; ld r10,r01,0
+; lb r10,r01,0
 ; ; Decrease counter r01
 ; addi r01,r01,-1
 ; ; Store r10 to a new memory point r04
@@ -120,7 +120,7 @@ nop
 ; jmp -5
 ; ; LOADTO31
 ; ;# put to r31 where it will be outputted
-; ld r31,r05,0
+; lb r31,r05,0
 ; ; Increase counter r05
 ; addi r05,r05,1
 ; ; Skip to END if Carriage return
