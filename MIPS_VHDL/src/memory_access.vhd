@@ -27,7 +27,7 @@ ARCHITECTURE behaviour OF memory_access IS
 		RAM_SIZE	    : NATURAL
 	);
 	PORT
-	(  clk			    : IN  std_logic; 
+	(   clk			    : IN  std_logic; 
 		rst			    : IN  std_logic;                                    --- rst
 		ramdata_in		: IN  std_logic_vector(MIPS_SIZE - 1 DOWNTO 0);     --- data input to RAM 
 		addr	        : IN  std_logic_vector(MIPS_SIZE - 1 DOWNTO 0);     --- address input
@@ -43,7 +43,7 @@ ARCHITECTURE behaviour OF memory_access IS
 		clk : in std_logic;
 		rst : in std_logic; 
 		reg3_addr_i : in  std_logic_vector(4 downto 0);
-	   reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb	
+	    reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb	
 		addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 		addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 		rd_data_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
