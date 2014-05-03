@@ -259,7 +259,7 @@ def main(argv):
     #Read input file
     with open(argv[0]) as input_file:
         #Open output file
-        output = open(input_file.name.rsplit(".", 1)[0] + ".bin", 'wb')
+        #output = open(input_file.name.rsplit(".", 1)[0] + ".bin", 'wb')
         output_lines = open(input_file.name.rsplit(".", 1)[0] + "_lines.bin", 'wb')
         for i in range(0, 2):
             cmdLineNumber = 0
@@ -287,7 +287,7 @@ def main(argv):
             input_file.seek(0, 0)
             firstRun = False
         #Close output file
-        output.close()
+        #output.close()
     #Program finished
     print "Finished"
 
