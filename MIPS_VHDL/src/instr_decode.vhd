@@ -142,7 +142,8 @@ port map(
 				when "100000" => --lb
 					rd_from_mem_s <= '1';
 				when "110000" => --sb
-					wr_to_mem_s <= '1'; 
+					wr_to_mem_s <= '1';
+                 	reg_3_p <= instr(25 downto 21); --r3data from r1					
 				when others =>
 			end case;
 	end case;
