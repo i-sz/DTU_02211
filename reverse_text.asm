@@ -18,41 +18,69 @@ addi r01,r00,0
 
 ;Read loop start
 ;Read from UART
+READUART:
 ld r10,r00,1
+
+nop
+nop
+nop
+nop
+nop
 
 ;Store to memory
 sb r10,r01,2
 
 ;Check if line end
-beq r10,r03,3
+beq r10,r03,READMEM
 
 ;Increase counter
 addi r01,r01,1
 
 ;Jump back to read more
-jmp -4
+jmp READUART
 ;Read loop end
 
+nop
+nop
+nop
+nop
+nop
+
 ;Read backwards loop start
-ld r11,r01,2
+READMEM:
+lb r11,r01,2
+
+nop
+nop
+nop
+nop
+nop
 
 ;Write to UART
 sb r11,r00,0
 
+nop
+nop
+nop
+nop
+nop
+
 ;Check if line end (counter is zero)
-beq r01,r00,3
+beq r01,r00,END
 
 ;Decrease counter
 addi r01,r01,-1
 
-jmp -4
+jmp READMEM
+
+END:
 
 nop
 nop
 nop
 nop
 nop
-nop
+
 
 
 

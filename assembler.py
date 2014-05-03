@@ -17,6 +17,10 @@
 import sys
 import re
 
+firstRun = True
+cmdLineNumber = 0
+points = {}
+
 #Calculates two's complement from a binary string
 #and returns it
 def twos_comp(binary):
@@ -68,8 +72,35 @@ def convert_imm(imm):
     # print binary
     return binary
 
-def convert_dst(dst):
+def convert_imm_dst(dst):
+    global points
+    global cmdLineNumber
+    #print "BEQ: Line: " + str(cmdLineNumber) + " - dst: " + str(points[dst])
+    dst = points[dst] - cmdLineNumber
+    #print dst
     dst = int(dst)
+    if dst < 0:
+        dst = dst - 1
+    binary = ""
+    # 16-bit imm value so between -2^15 and 2^15 (signed value)
+    if dst > -pow(2,15) and dst < pow(2,15):
+        binary = binary + '{0:016b}'.format(abs(dst))
+        if dst < 0:
+            binary = twos_comp(binary)
+    else:
+        return False
+    #print binary
+    return str(binary)
+
+def convert_dst(dst):
+    global points
+    global cmdLineNumber
+    #print "JMP: Line: " + str(cmdLineNumber) + " - dst: " + str(points[dst])
+    dst = points[dst] - cmdLineNumber
+    #print dst
+    dst = int(dst)
+    if dst < 0:
+        dst = dst - 1
     binary = ""
     # 26-bit dst value so between -2^25 and 2^25 (signed value)
     if dst > -pow(2,25) and dst < pow(2,25):
@@ -78,7 +109,7 @@ def convert_dst(dst):
             binary = twos_comp(binary)
     else:
         return False
-    # print binary
+    #print binary
     return str(binary)
     
 
@@ -127,10 +158,12 @@ def parse_imm(line):
     regs_imm = parts[1].split(",")
     regs = [regs_imm[0], regs_imm[1]]
     imm = regs_imm[2]
+    imm_binary = None
     if re.search("addi", op):
         op_binary = "100001"
     elif re.search("beq", op):
         op_binary = "000010"
+        imm_binary = convert_imm_dst(imm)
     elif re.search("lb", op):
         op_binary = "100000"
     elif re.search("sb", op):
@@ -138,7 +171,8 @@ def parse_imm(line):
     else:
         op_binary = False
     reg_binary = convert_regs(regs)
-    imm_binary = convert_imm(imm)
+    if imm_binary == None:
+        imm_binary = convert_imm(imm)
     if reg_binary == False or imm_binary == False or op_binary == False:
         return False
     else:
@@ -162,12 +196,26 @@ def parse_jmp(line):
         binary = op_binary + dst_binary
     return binary
 
+def parse_points(line):
+    global points
+    global cmdLineNumber
+    parts = line.split(":")
+    point = parts[0]
+    points[point] = cmdLineNumber
+    return True
+
 #Check line operation type
 def parse_line(line):
+    global firstRun
+    global cmdLineNumber
     reg_types=["add", "sub", "mult", "div", "and", "or", "slt", "srl", "slr", "nop"]
     imm_types=["addi", "beq", "lb", "sb"]
     jmp_types=["jmp"]
 
+    if firstRun == True:
+        if re.search("[a-zA-Z0-9]:$", line):
+            #print "FOUND"
+            return not parse_points(line)
     #Commented lines start with # or ;
     if re.match("#", line):
         return False
@@ -177,14 +225,20 @@ def parse_line(line):
         #Registry-type ops
         for reg in reg_types:
             if re.search(reg+"\s", line) or re.search(reg+"$", line):
+                if firstRun == True:
+                    return "00000000000000000000000000000000"
                 binary = parse_reg(line)
         #Immediate-type ops
         for imm in imm_types:
             if re.search(imm+"\s", line):
+                if firstRun == True:
+                    return "00000000000000000000000000000000"
                 binary = parse_imm(line)
         #Jump-type ops
         for jmp in jmp_types:
             if re.search(jmp+"\s", line):
+                if firstRun == True:
+                    return "00000000000000000000000000000000"
                 binary = parse_jmp(line)
         #Check if binary is defined
         try:
@@ -196,6 +250,8 @@ def parse_line(line):
 
 #Main program
 def main(argv):
+    global cmdLineNumber
+    global firstRun
     if (len(argv) == 0):
         print "Give assembly file as a parameter"
         exit(0)
@@ -205,21 +261,27 @@ def main(argv):
         #Open output file
         output = open(input_file.name.rsplit(".", 1)[0] + ".bin", 'wb')
         output_lines = open(input_file.name.rsplit(".", 1)[0] + "_lines.bin", 'wb')
-        #Read file line by line
-        for line in input_file:
-            #Strip empty characters from left and right
-            binary = parse_line(line.rstrip().lstrip())
-            #If there is no errors parsing code, output it
-            if binary != False:
-                if len(binary) == 32:
-                    #Print output
-                    print "\"" + binary + "\"; -- " + str(line.rstrip().lstrip())
-                    #Write output to file
-                    #output.write(binary)
-                    output_lines.write("\"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
-                else:
-                    print "Error!!"
-                    exit(0)
+        for i in range(0, 2):
+            cmdLineNumber = 0
+            #Read file line by line
+            for line in input_file:
+                #Strip empty characters from left and right
+                binary = parse_line(line.rstrip().lstrip())
+                #If there is no errors parsing code, output it
+                if binary != False:
+                    if len(binary) == 32:
+                        cmdLineNumber = cmdLineNumber + 1
+                        #Print output
+                        if firstRun == False:
+                            print "\"" + binary + "\"; -- " + str(line.rstrip().lstrip())
+                            #Write output to file
+                            #output.write(binary)
+                            output_lines.write("\"" + binary + "\"; -- " + str(line.rstrip().lstrip()) + "\n")
+                    else:
+                        print "Error!!"
+                        exit(0)
+            input_file.seek(0, 0)
+            firstRun = False
         #Close output file
         output.close()
     #Program finished
