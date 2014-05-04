@@ -19,8 +19,9 @@ port(
 );
 end component;
 
-    signal clk,led_s,uart_tx_s,uart_rx_s	 : std_logic;
+    signal led_s,uart_tx_s,uart_rx_s	 : std_logic;
 	signal reset : std_logic;
+		signal clk : std_logic :='0';
 	
 BEGIN
     top_i: top
@@ -32,10 +33,10 @@ BEGIN
 		led => led_s
 	);
 
-    clk_proc: process
+   clk_proc: process
 		begin
-          clk <= '1', '0' AFTER 5 ns;
           WAIT FOR 10 ns;
+			clk <= not clk;
     end process;
 	
 	reset_proc: process
