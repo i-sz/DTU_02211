@@ -33,12 +33,12 @@ end component;
 
 component sc_uart
 generic (addr_bits : integer := 2;
-			 clk_freq : integer := 50_000_000;
+			 clk_freq : integer := 10_000_000;
 			 baud_rate : integer := 115200;
-			 txf_depth : integer := 32; 
-			 txf_thres : integer := 32;
-			 rxf_depth : integer := 32; 
-			 rxf_thres : integer := 32);
+			 txf_depth : integer := 4; 
+			 txf_thres : integer := 2;
+			 rxf_depth : integer := 4; 
+			 rxf_thres : integer := 2);
 	port (
 		clk		: in std_logic;
 		reset	: in std_logic;
