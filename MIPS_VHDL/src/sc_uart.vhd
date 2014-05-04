@@ -63,13 +63,13 @@ use ieee.numeric_std.all;
 
 entity sc_uart is
 
-	generic (addr_bits : integer := 16;
-			 clk_freq : integer := 50_000_000;
-			 baud_rate : integer := 9600;
-			 txf_depth : integer := 8; 
-			 txf_thres : integer := 8;
-			 rxf_depth : integer := 8; 
-			 rxf_thres : integer :=8);
+	generic (addr_bits : integer := 2;
+			 clk_freq : integer := 10_000_000;
+			 baud_rate : integer := 115200;
+			 txf_depth : integer := 4; 
+			 txf_thres : integer := 2;
+			 rxf_depth : integer := 4; 
+			 rxf_thres : integer :=2);
 	port (
 		clk		: in std_logic;
 		reset	: in std_logic;
