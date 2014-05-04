@@ -85,6 +85,16 @@ port(
 );
 end component;
 
+component pll IS
+	PORT
+	(
+		areset		: IN STD_LOGIC  := '0';
+		inclk0		: IN STD_LOGIC  := '0';
+		c0		: OUT STD_LOGIC ;
+		locked		: OUT STD_LOGIC 
+	);
+END component;
+
 
 
 --signals from mips to uart adapter
@@ -99,9 +109,22 @@ signal uart_address_s, rdy_cnt_s : std_logic_vector(1 downto 0);
 
 signal rdy_cnt_s_u : unsigned(1 downto 0);
 
+signal clk_s : std_logic;
+
 begin
 
 rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
+
+
+pll_i : pll
+	PORT MAP
+	(
+		areset => rst,
+		inclk0 => clk,
+		c0		=> clk_S,
+		locked	 => open
+	);
+
 
   uart_inst : sc_uart port map       -- Maps internal signals to ports
     (
@@ -111,7 +134,7 @@ rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
       wr      => wr_s,
       rd_data => rd_data_s,
       rdy_cnt => rdy_cnt_s_u,
-      clk     => clk,
+      clk     => clk_s,
       reset   => rst,
       txd     => uart_tx,
       rxd     => uart_rx,
@@ -121,7 +144,7 @@ rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
 
   mips_inst : top_mips port map
     (
-      clock => clk,
+      clock => clk_s,
 	   reset => rst,
         wr_ena => wr_ena_s, 
 		rd_ena => rd_ena_s,
@@ -138,7 +161,7 @@ rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
 
 --global signals
 
-    clk => clk,
+    clk => clk_s,
     rst => rst,
 
 -- processor interface

@@ -1,0 +1,27 @@
+{C:/Users/Harri/Dropbox/Koulu/Kurssit/F14/02211 ACA/project/shared_components.vhd} {1 {vcom -nostats -work mips -2002 -explicit {C:/Users/Harri/Dropbox/Koulu/Kurssit/F14/02211 ACA/project/shared_components.vhd}
+Model Technology ModelSim PE Student Edition vcom 10.3 Compiler 2014.01 Jan  6 2014
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity mux2
+-- Compiling architecture mux2_arc of mux2
+-- Compiling entity reg
+-- Compiling architecture behaviour of reg
+-- Loading package NUMERIC_STD
+-- Compiling entity FULL_ADDER
+-- Compiling architecture behavior of FULL_ADDER
+-- Compiling entity adder
+-- Compiling architecture behavior of adder
+
+} {} {}} {C:/Users/Harri/Dropbox/Koulu/Kurssit/F14/02211 ACA/project/instr_fetch.vhd} {1 {vcom -nostats -work mips -2002 -explicit {C:/Users/Harri/Dropbox/Koulu/Kurssit/F14/02211 ACA/project/instr_fetch.vhd}
+Model Technology ModelSim PE Student Edition vcom 10.3 Compiler 2014.01 Jan  6 2014
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity instr_fecth
+-- Compiling architecture behaviour of instr_fecth
+-- Compiling entity ifetch_idecode_regs
+-- Compiling architecture behaviour of ifetch_idecode_regs
+
+} {} {}}

@@ -7,6 +7,8 @@ outputt/
 mips/
 db/
 sim/
+incremental_db/
+greybox_tmp/
 
 #################
 ## Eclipse
