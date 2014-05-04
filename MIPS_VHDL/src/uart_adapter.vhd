@@ -40,6 +40,8 @@ begin
 if rising_edge(clk) then
     uart_wr_data <= (others => '0');
     uart_wr_ena <= '0';
+	uart_addr <= "00";
+
     if mem_wr_ena = '1' then
         if mem_address(0) = '0' then
             uart_wr_data <= mem_data_in;
@@ -53,7 +55,6 @@ if rising_edge(clk) then
     uart_rd_ena <='0';
     to_proc_data_in <= (others => '0');     
     to_proc_rd_ena <= '0';
-    uart_addr <= "01";
 	if mem_rd_ena = '1' then
      	if mem_address(0) = '1' then
 			uart_rd_ena <='1';
