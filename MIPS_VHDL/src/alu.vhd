@@ -29,9 +29,9 @@ output64 <= (others => '0');
 		when "110" => output <= std_logic_vector(unsigned(input_a) - unsigned(input_b));
 		when "111" => 
 		 if (unsigned(input_a) < unsigned(input_b)) then
-		  output <= (others => '1');
+		  output <= "00000000000000000000000000000001";
 		  else 
-		  output <=(others => '0'); 
+		  output <= "00000000000000000000000000000000";
 		 end if;  
 		when others => output <= (others => '0');
  	end case;

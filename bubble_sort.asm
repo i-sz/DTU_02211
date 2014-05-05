@@ -39,7 +39,11 @@ addi r09,r00,8
 addi r10,r00,0
 ;Counter2
 addi r11,r00,0
-
+nop
+nop
+nop
+nop
+nop
 
 LOOP:
 addi r10,r10,1
@@ -91,5 +95,8 @@ jmp LOOP
 
 END:
 
-
+nop
+nop
+nop
+addi r01,r00,1
 

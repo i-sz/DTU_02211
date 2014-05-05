@@ -106,7 +106,7 @@ port map(
 				when "101001" => --or
 					alu_ctrl_p <= "111";
 				when "110100" => --slt
-					alu_ctrl_p <= "100";
+					alu_ctrl_p <= "111";
 				when "111000" => --srl
 					alu_ctrl_p <= "101";
 				when "111001" => --slr
@@ -141,9 +141,11 @@ port map(
 					pc_sel_p <= '1' ;
 				when "100000" => --lb
 					rd_from_mem_s <= '1';
+					alu_ctrl_p <= "010";
 				when "110000" => --sb
 					wr_to_mem_s <= '1';
-                 	reg_3_p <= instr(25 downto 21); --r3data from r1					
+                 	reg_3_p <= instr(25 downto 21); --r3data from r1
+					alu_ctrl_p <= "010";
 				when others =>
 			end case;
 	end case;
