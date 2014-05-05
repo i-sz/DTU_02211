@@ -82,7 +82,7 @@ addr <= to_integer(unsigned(address));
        when 4*63   => data <= "00000000000000000000000000000000"; -- nop
        when 4*64   => data <= "10000100001000000000000000000001"; -- addi r01,r00,1
 
-	    when others => data <= "11111111111111111111111111111111"; 
+	    when others => data <= "00000000000000000000000000000000"; 
        end case;
 	end process;
 end behavioral;

@@ -14,7 +14,8 @@ port(
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0)
+	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
+	wr_to_mem : out std_logic
 );
 end memory_access; 
 
@@ -77,6 +78,8 @@ BEGIN
 		rd_data_in => rd_data_s,
 		rd_data_out => rd_data
 	);
+	
+	wr_to_mem <= wr;
 
 END behaviour;
 
@@ -91,7 +94,7 @@ ENTITY MEM_WB_regs is
 port(
 	clk : in std_logic;
 	rst : in std_logic;
-   reg3_addr_i : in  std_logic_vector(4 downto 0);
+    reg3_addr_i : in  std_logic_vector(4 downto 0);
 	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb		
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -104,7 +107,7 @@ ARCHITECTURE behaviour OF MEM_WB_regs IS
 
 
 BEGIN
-  process (clk,rst,addr_in,rd_data_in )
+  process (clk,rst,addr_in,rd_data_in)
   begin
 	  if (rst = '1') then
 		  addr_out    <= (others => '0');
@@ -113,7 +116,7 @@ BEGIN
 		elsif clk'event and clk = '1' then
 		  addr_out    <= addr_in;
 		  rd_data_out <= rd_data_in;
-        reg3_addr_o	<= 	reg3_addr_i;  
+          reg3_addr_o	<= 	reg3_addr_i;  
 		end if;
  end process;
 END behaviour;
