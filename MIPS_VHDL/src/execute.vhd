@@ -79,7 +79,7 @@ begin
   else
   	jump_or_branch_addres <= std_logic_vector(unsigned(pc_addr_in) + 1);
   end if;	
-  		
+end process;  		
 
 --branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0)));  
 --jump_or_branch_address <= branch_address when (a = x"00000000") else sign_extend;
