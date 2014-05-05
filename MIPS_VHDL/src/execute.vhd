@@ -71,13 +71,18 @@ input_b <= B when (alu_src ='0') else sign_extend;
 process(pc_sel_in, a, sign_extend, pc_addr_in)
 begin
   if (pc_sel_in = '1' ) then
-  	if (a = x"00000000") then
-  		jump_or_branch_addres <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0) + unsigned(sign_extend(31 DOWNTO 0)-2);
+  	if (a = "00000000000000000000000000000000") then
+		case sign_extend(31) is
+			when '1' =>
+				jump_or_branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0) shift_left 2));
+			when others =>
+				jump_or_branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) - unsigned(sign_extend(31 DOWNTO 0) shift_left 2));
+		end case;
   	else	
-		jump_or_branch_addres <= sign_extend;
+		jump_or_branch_address <= sign_extend;
 	end if;
   else
-  	jump_or_branch_addres <= std_logic_vector(unsigned(pc_addr_in) + 1);
+  	jump_or_branch_address <= std_logic_vector(unsigned(pc_addr_in));
   end if;	
 end process;  		
 
