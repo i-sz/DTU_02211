@@ -79,7 +79,7 @@ begin
 		pc_sel_out <= '0';
 		pc_address_out <= (others => '0');
 		b_out <= (others => '0');
-      memory_wr  <= '0';
+		memory_wr  <= '0';
 		memory_rd  <= '0';
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
