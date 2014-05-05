@@ -36,6 +36,9 @@ signal branch_address, jump_or_branch_address  : std_logic_vector(31 downto 0);
 signal alu_result_p : std_logic_vector(31 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
 
+signal sign_extend_shifted : std_logic_vector(31 downto 0);
+
+
 
 
 
@@ -66,28 +69,13 @@ input_a <= A;
 input_b <= B when (alu_src ='0') else sign_extend;
 
 
---Branching
 
-process(pc_sel_in, a, sign_extend, pc_addr_in)
-begin
-  if (pc_sel_in = '1' ) then
-  	if (a = "00000000000000000000000000000000") then
-		case sign_extend(31) is
-			when '1' =>
-				jump_or_branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0) shift_left 2));
-			when others =>
-				jump_or_branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) - unsigned(sign_extend(31 DOWNTO 0) shift_left 2));
-		end case;
-  	else	
-		jump_or_branch_address <= sign_extend;
-	end if;
-  else
-  	jump_or_branch_address <= std_logic_vector(unsigned(pc_addr_in));
-  end if;	
-end process;  		
 
---branch_address <= std_logic_vector(unsigned(pc_addr_in(31 DOWNTO 0)) + unsigned(sign_extend(31 DOWNTO 0)));  
---jump_or_branch_address <= branch_address when (a = x"00000000") else sign_extend;
+--Branching 		
+
+sign_extend_shifted <= sign_extend(29 downto 0) & "00";
+branch_address <= std_logic_vector(unsigned(pc_addr_in) + unsigned(sign_extend_shifted));  
+jump_or_branch_address <= branch_address when (a = x"00000000" and pc_sel_in ='1') else sign_extend;
 
 --pipeline stage
 process(clk,rst)
