@@ -53,7 +53,7 @@ signal cnt : unsigned(4 downto 0) := (others => '0');
 
 --read_counter
 signal cnt_rd : unsigned(4 downto 0) := (others => '0');
-signal cnt_rd_ena : std_LOGIC;
+signal cnt_rd_ena, cnt_rd_ena_f : std_LOGIC;
 
 signal state, next_state : std_logic_vector(2 downto 0) := (others => '0');
 
@@ -62,7 +62,7 @@ constant st_buffer  : std_logic_vector(2 downto 0) := "001";
 constant st_read  : std_logic_vector(2 downto 0) := "010";
 constant st_wait  : std_logic_vector(2 downto 0) := "011";
 constant st_write : std_logic_vector(2 downto 0) := "100";
-
+constant st_wait_more : std_logic_vector(2 downto 0) := "101";
 --ram signals
 
 signal address_s : STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -83,7 +83,7 @@ uart_buffer: Data_Memory
 		ramdata_out => q_s
 	);
 
-cnt_rd_ena <= '1' when (state = st_read) else '0';
+cnt_rd_ena <= '1' when (cnt_rd_ena_f ='1') else '0';
 
 
 --write counter
@@ -128,6 +128,7 @@ address_s <= (others => '0');
 data_s <= (others => '0');
 wren_s <= '0';
 rden_s <= '0';
+cnt_rd_ena_f <='0';
 
 		case (state) is
         when st_start =>  
@@ -140,7 +141,7 @@ rden_s <= '0';
 			address_s <= "000000000000000000000000000" & std_logic_vector(cnt);
 			wren_s <= mem_wr_ena;
 		
-		if (cnt = "11111") then
+		if (cnt = "01100") then
 			next_state <= st_read;
 		end if;	
 
@@ -156,18 +157,24 @@ rden_s <= '0';
 		
 		when st_wait =>
 		
-			if uart_rd_data(0) <= '1' then
+			
 					next_state <= st_write;
-			end if;
+			
 	
 		when st_write =>
-            uart_wr_ena      <= '1';
+		if uart_rd_data(0) = '1' then
+				cnt_rd_ena_f <='1'; 
+				uart_wr_ena      <= '1';
 				uart_rd_ena 	  <= '0';
-				uart_addr <= "00";  -- tell the uart that we want to write data
-            uart_wr_data <= q_s;  -- write 0+cnt
+				uart_addr <= "01";  -- tell the uart that we want to write data
+				uart_wr_data <= q_s;  -- write 0+cnt
 				address_s <= "000000000000000000000000000" & std_logic_vector(cnt_rd);
 				rden_s <= '1';
-		if cnt_rd < "11111" then
+			end if;	
+			next_state <= st_wait_more;
+				
+		when st_wait_more =>		
+		if cnt_rd < "01111" then
 			next_state <= st_read;
 		end if;
 		 when others => null;
