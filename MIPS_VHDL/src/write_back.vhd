@@ -23,7 +23,7 @@ ARCHITECTURE behaviour OF write_back IS
 
 BEGIN
 
-process (clk, rst,alu_result,wr_reg_in,rd_data )
+process (clk, rst,alu_result,wr_reg_in,rd_data, wr_mem_wb )
 	begin
 	 if (rst = '1' or wr_mem_wb = '1') then
 	   wr_reg_out <= (others => '0');
