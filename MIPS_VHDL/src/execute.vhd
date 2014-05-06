@@ -15,7 +15,7 @@ port(
 	alu_ctrl : in std_logic_vector(2 downto 0);
 	alu_src : in  std_logic;
 	pc_addr_in : in std_logic_vector(31 downto 0);
-	pc_sel_in : in std_logic;
+	pc_sel_in : in std_logic; -- jump flag
 	alu_result : out std_logic_vector(31 downto 0);
 	pc_sel_out : out std_logic; -- controls the mux in IF
 	pc_address_out : out std_logic_vector(31 downto 0);	--input to the PC_ADDR mux
@@ -25,7 +25,9 @@ port(
 	memory_wr  : out std_logic;
 	memory_rd  : out std_logic;
 	branch_i : in std_logic;
-	branch_o : out std_logic
+	branch_o : out std_logic;
+	wb_reg_i : in std_logic; -- write back flag to register file
+	wb_reg_o : out std_logic
 );
 end execute;
 
@@ -37,7 +39,7 @@ signal branch_address, jump_or_branch_address  : std_logic_vector(31 downto 0);
 --signals for the pipeline stage
 signal alu_result_p : std_logic_vector(31 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
-signal ab_test : std_logic;
+signal ab_test,pc_sel_actual : std_logic;
 
 signal sign_extend_shifted : std_logic_vector(31 downto 0);
 
@@ -77,10 +79,10 @@ input_b <= B when (alu_src ='0') else sign_extend;
 --Branching 		
 
 sign_extend_shifted <= sign_extend(29 downto 0) & "00";
-branch_address <= std_logic_vector(unsigned(sign_extend_shifted));
+branch_address <= std_logic_vector(unsigned(pc_addr_in) + unsigned(sign_extend_shifted));
 ab_test <= '1' when a = b else '0';
-jump_or_branch_address <= branch_address when ((a = x"00000000" and pc_sel_in ='1' and branch_i = '0') or (ab_test = '1' and branch_i ='1')) else pc_addr_in;
-						 
+jump_or_branch_address <= branch_address when (ab_test = '1' and branch_i ='1') else sign_extend;
+pc_sel_actual <= '1' when ((ab_test = '1' and branch_i ='1') or pc_sel_in = '1') else '0';						 
 
 
 
@@ -96,15 +98,17 @@ begin
 		memory_wr  <= '0';
 		memory_rd  <= '0';
 		branch_o <= '0';
+		wb_reg_o <= '0';
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
 		reg3_addr_o <= reg3_addr_i;
 		pc_address_out <= jump_or_branch_address; --jump_or_branch_address
-		pc_sel_out <= pc_sel_in;
+		pc_sel_out <= pc_sel_actual;
 		b_out <= b;
 		memory_wr  <= wr_to_mem;
 		memory_rd  <= rd_from_mem;
 		branch_o <= branch_i;
+		wb_reg_o  <= wb_reg_i;
 	end if;
 end process;	  
 		
