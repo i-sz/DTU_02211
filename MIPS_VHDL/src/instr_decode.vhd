@@ -30,7 +30,8 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	alu_src : out std_logic;
 	wr_to_mem : out std_logic;
 	rd_from_mem : out std_logic;
-	branch : out std_logic
+	branch : out std_logic;
+	wb_reg_o : out std_logic
 );
 end instr_decode;
 
@@ -40,7 +41,7 @@ architecture behaviour of instr_decode is
 	signal alu_ctrl_p : std_logic_vector(2 downto 0);
 	signal sign_extend_p : std_logic_vector(31 downto 0);
 	signal alu_src_s, pc_sel_p : std_logic;
-	signal branch_s : std_logic;
+	signal branch_s,wb_reg : std_logic;
 	
 	signal wr_to_mem_s, rd_from_mem_s : std_logic;
 	
@@ -87,6 +88,7 @@ port map(
 	wr_to_mem_s <= '0';
 	rd_from_mem_s <= '0';
 	branch_s <= '0';
+	wb_reg <= '0';
 	
 	case instr(31 downto 26) is
 		when "000000" => --register functions
@@ -95,6 +97,7 @@ port map(
 			reg_2_p <= instr(20 downto 16); --from r2
 			reg_3_p <= instr(15 downto 11); --from r3
 			alu_src_s <= '0';
+			wb_reg <= '1';
 			case instr(5 downto 0) is
 				when "100000" => --add
 					alu_ctrl_p <= "010";
@@ -115,6 +118,7 @@ port map(
 				when "111001" => --slr
 					alu_ctrl_p <= "101";
 				when others =>
+				     wb_reg <= '0';
 			end case;
 		when "000001" => --jmp
 			sign_extend_p(25 downto 0) <= instr(25 downto 0);
@@ -140,8 +144,9 @@ port map(
 			case instr(31 downto 26) is
 				when "100001" => --addi
 					alu_ctrl_p <= "010";
+					wb_reg <= '1';
 				when "000010" => --beq
-					pc_sel_p <= '1';
+					pc_sel_p <= '0';
 					branch_s <= '1';
 					reg_3_p <= instr(25 downto 21); --r3data from r1
 				when "100000" => --lb
@@ -168,6 +173,7 @@ port map(
 			wr_to_mem <= '0';
 			rd_from_mem <= '0';
 			branch <= '0';
+			wb_reg_o <= '0';
 		elsif rising_edge(clk) then 
 			reg_2_data <= reg_2data;
 			reg_3_data <= reg_3data;
@@ -180,6 +186,7 @@ port map(
 			wr_to_mem <= wr_to_mem_s;
 			rd_from_mem <= rd_from_mem_s;
 			branch <= branch_s;
+			wb_reg_o <= wb_reg;
 		end if;
 	end process;
 end behaviour;
