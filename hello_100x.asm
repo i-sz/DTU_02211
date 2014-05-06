@@ -56,11 +56,19 @@ sb r09,r00,0
 sb r10,r00,0
 sb r11,r00,0
 sb r12,r00,0
+nop
+nop
+nop
+nop
+nop
 jmp C1
 
-
+nop
+nop
+nop
+nop
+nop
 nop
 END:
 nop
-jmp END
 nop
