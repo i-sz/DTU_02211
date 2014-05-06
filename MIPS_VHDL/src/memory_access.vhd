@@ -18,7 +18,9 @@ port(
 	wr_to_mem : out std_logic;
 	rd_from_mem : out std_logic;
 	branch_i : in std_logic;
-	branch_o : out std_logic
+	branch_o : out std_logic;
+	wb_reg_i : in std_logic;
+	wb_reg_o : out std_logic
 );
 end memory_access; 
 
@@ -82,10 +84,22 @@ BEGIN
 		rd_data_out => rd_data
 	);
 	
-	wr_to_mem <= wr;
-	rd_from_mem <= rd;
-	branch_o <= branch_i;
+	
+	process (clk,rst)
+	begin 
+	if (rst = '1') then
+		  wr_to_mem    <= '0';
+		  rd_from_mem <= '0';
+		  branch_o <= '0';
+		  wb_reg_o <=  '0';
+		elsif clk'event and clk = '1' then
+			wr_to_mem <= wr;
+			rd_from_mem <= rd;
+			branch_o <= branch_i;
+			wb_reg_o <= wb_reg_i;
+		end if;
 
+    end process;
 END behaviour;
 
 
@@ -112,7 +126,7 @@ ARCHITECTURE behaviour OF MEM_WB_regs IS
 
 
 BEGIN
-  process (clk,rst,addr_in,rd_data_in)
+  process (clk,rst) --,addr_in,rd_data_in,reg3_addr_i
   begin
 	  if (rst = '1') then
 		  addr_out    <= (others => '0');
