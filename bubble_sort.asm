@@ -74,7 +74,11 @@ nop
 slt r03,r01,r02
 
 beq r11,r09,END
-
+nop
+nop
+nop
+nop
+nop
 addi r11,r11,1
 
 nop

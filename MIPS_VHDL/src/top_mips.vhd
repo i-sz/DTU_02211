@@ -104,7 +104,8 @@ port(
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_to_mem : out std_logic
+	wr_to_mem : out std_logic;
+	rd_from_mem : out std_logic
 );
 end component;   
 	
@@ -119,7 +120,8 @@ port(
 	wr_reg_out : out std_logic_vector(ADDR_SIZE-1 downto 0);
 	wr_flag : out std_logic;
 	wr_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_mem_wb : in std_logic
+	wr_mem_wb : in std_logic;
+	rd_mem_wb : in std_logic
 
 );
 end component;
@@ -164,6 +166,7 @@ signal wr_reg_stage4                      : std_logic_vector(ADDR_SIZE-1 downto 
 signal mem_wr                             : std_logic;
 signal mem_rd                             : std_logic;
 signal wr_mem_ma						  : std_logic;
+signal rd_mem_ma						  : std_logic;
 	
 -- write_back
 signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 0);
@@ -247,7 +250,8 @@ port map(
 	addr_out => addr_s,
 	wr_data => b_out_s,
 	rd_data => rd_data_s,
-	wr_to_mem => wr_mem_ma
+	wr_to_mem => wr_mem_ma,
+	rd_from_mem => rd_mem_ma
 );
 
 
@@ -260,9 +264,10 @@ port map(
 	alu_result => addr_s,
 	wr_reg_in => reg1_addr_ex_s1,
 	wr_reg_out => r1_addr_s,
-	wr_flag => wb_ena_s, 
+	wr_flag => wb_ena_s,
 	wr_data => r1_data_s,
-	wr_mem_wb => wr_mem_ma
+	wr_mem_wb => wr_mem_ma,
+	rd_mem_wb => rd_mem_ma
 );
 	
 	rd_ena  <= mem_rd;

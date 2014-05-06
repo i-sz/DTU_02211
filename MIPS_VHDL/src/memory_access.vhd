@@ -15,7 +15,8 @@ port(
 	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	wr_to_mem : out std_logic
+	wr_to_mem : out std_logic;
+	rd_from_mem : out std_logic
 );
 end memory_access; 
 
@@ -63,7 +64,7 @@ BEGIN
 		ramdata_in => wr_data,
 		addr => addr_in,
 		ram_write => wr,
-		ram_read => '0',
+		ram_read => rd,
 		ramdata_out => rd_data_s
 	);
 
@@ -80,6 +81,7 @@ BEGIN
 	);
 	
 	wr_to_mem <= wr;
+	rd_from_mem <= rd;
 
 END behaviour;
 

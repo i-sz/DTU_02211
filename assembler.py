@@ -76,11 +76,11 @@ def convert_imm_dst(dst):
     global points
     global cmdLineNumber
     #print "BEQ: Line: " + str(cmdLineNumber) + " - dst: " + str(points[dst])
-    dst = points[dst] - cmdLineNumber
+    dst = points[dst]# - cmdLineNumber
     #print dst
-    dst = int(dst)
+    dst = int(dst)-1
     if dst < 0:
-        dst = dst - 1
+        dst = dst
     binary = ""
     # 16-bit imm value so between -2^15 and 2^15 (signed value)
     if dst > -pow(2,15) and dst < pow(2,15):
@@ -96,11 +96,11 @@ def convert_dst(dst):
     global points
     global cmdLineNumber
     #print "JMP: Line: " + str(cmdLineNumber) + " - dst: " + str(points[dst])
-    dst = points[dst] - cmdLineNumber
+    dst = points[dst]# - cmdLineNumber
     #print dst
-    dst = int(dst)
+    dst = int(dst)-1
     if dst < 0:
-        dst = dst - 1
+        dst = dst
     binary = ""
     # 26-bit dst value so between -2^25 and 2^25 (signed value)
     if dst > -pow(2,25) and dst < pow(2,25):
