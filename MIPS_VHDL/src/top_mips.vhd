@@ -64,7 +64,8 @@ port(
 	alu_src : out std_logic;
 	wr_to_mem : out std_logic;
 	rd_from_mem : out std_logic;
-	branch : out std_logic
+	branch : out std_logic;
+    wb_reg_o : out std_logic
 );
 end component;
 
@@ -90,7 +91,10 @@ port(
 	memory_wr  : out std_logic;
 	memory_rd  : out std_logic;
 	branch_i : in std_logic;
-	branch_o : out std_logic
+	branch_o : out std_logic;
+	wb_reg_i : in std_logic;
+	wb_reg_o : out std_logic
+	
 	);
 end component;
 
@@ -110,7 +114,9 @@ port(
 	wr_to_mem : out std_logic;
 	rd_from_mem : out std_logic;
 	branch_i : in std_logic;
-	branch_o : out std_logic
+	branch_o : out std_logic;
+	wb_reg_i : in std_logic;
+	wb_reg_o : out std_logic
 );
 end component;   
 	
@@ -127,7 +133,8 @@ port(
 	wr_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_mem_wb : in std_logic;
 	rd_mem_wb : in std_logic;
-	branch : in std_logic
+	branch : in std_logic;
+	wb_reg_i : in std_logic
 
 );
 end component;
@@ -148,7 +155,9 @@ signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 signal wr_flag_s,wb_ena_s              : std_logic;
 signal alu_src_s					   : std_logic;
-signal wr_to_mem_s, rd_from_mem_s : std_logic;
+signal wr_to_mem_s, rd_from_mem_s      : std_logic;
+signal wb_reg_s0,wb_reg_s1,wb_reg_s2 : std_logic;
+
 signal branch_s : std_logic;
 
 
@@ -221,7 +230,8 @@ port map(
 	alu_src => alu_src_s,
 	wr_to_mem => wr_to_mem_s,
 	rd_from_mem => rd_from_mem_s,
-	branch => branch_s
+	branch => branch_s,
+    wb_reg_o => wb_reg_s0
 );			
 	
 execute_i : execute
@@ -246,7 +256,9 @@ port map(
 	wr_to_mem => wr_to_mem_s,
 	rd_from_mem => rd_from_mem_s,
 	branch_i => branch_s,
-	branch_o => branch_sm
+	branch_o => branch_sm,
+	wb_reg_i => wb_reg_s0,
+    wb_reg_o => wb_reg_s1
 	);	
 
 memory_access_i : memory_access
@@ -265,7 +277,9 @@ port map(
 	wr_to_mem => wr_mem_ma,
 	rd_from_mem => rd_mem_ma,
 	branch_i => branch_sm,
-	branch_o => branch_mw
+	branch_o => branch_mw,
+	wb_reg_i => wb_reg_s1,
+    wb_reg_o => wb_reg_s2
 );
 
 
@@ -282,7 +296,8 @@ port map(
 	wr_data => r1_data_s,
 	wr_mem_wb => wr_mem_ma,
 	rd_mem_wb => rd_mem_ma,
-	branch => branch_mw
+	branch => branch_mw,
+	wb_reg_i => wb_reg_s2
 );
 	
 	rd_ena  <= mem_rd;
@@ -291,6 +306,6 @@ port map(
     data_out <= b_out_s;
     data_in_s <= data_in when (uart_rd_ena='1') else r1_data_s;
     addr_in_s <= r1_addr_s;
-	wr_flag_s <= uart_rd_ena or wb_ena_s;
+	wr_flag_s <= wb_ena_s;
    	
 end structural;
