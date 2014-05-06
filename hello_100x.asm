@@ -72,7 +72,7 @@ nop
 nop
 nop
 nop
-jmp C1
+;jmp C1
 
 nop
 nop
