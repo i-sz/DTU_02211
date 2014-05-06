@@ -13,47 +13,12 @@
 INITIALIZE:
 ;Initialize some values
 addi r01,r00,10
-nop
-nop
-nop
-nop
-nop
 addi r02,r00,15
-nop
-nop
-nop
-nop
-nop
 addi r03,r00,5
-nop
-nop
-nop
-nop
-nop
 addi r04,r00,7
-nop
-nop
-nop
-nop
-nop
 addi r05,r00,12
-nop
-nop
-nop
-nop
-nop
 addi r06,r00,17
-nop
-nop
-nop
-nop
-nop
 addi r07,r00,13
-nop
-nop
-nop
-nop
-nop
 addi r08,r00,2
 nop
 nop
