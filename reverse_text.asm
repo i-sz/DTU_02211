@@ -13,6 +13,9 @@
 ;End of the line sign
 addi r03,r00,13
 
+;For minus things
+addi r04,r00,1
+
 ;Counter
 addi r01,r00,0
 
@@ -69,7 +72,7 @@ nop
 beq r01,r00,END
 
 ;Decrease counter
-addi r01,r01,-1
+sub r01,r01,r04
 
 jmp READMEM
 
