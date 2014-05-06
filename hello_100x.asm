@@ -45,16 +45,27 @@ nop
 
 C1:
 sb r01,r00,0
+nop
 sb r02,r00,0
+nop
 sb r03,r00,0
+nop
 sb r04,r00,0
+nop
 sb r05,r00,0
+nop
 sb r06,r00,0
+nop
 sb r07,r00,0
+nop
 sb r08,r00,0
+nop
 sb r09,r00,0
+nop
 sb r10,r00,0
+nop
 sb r11,r00,0
+nop
 sb r12,r00,0
 nop
 nop
