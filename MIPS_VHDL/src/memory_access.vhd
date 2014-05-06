@@ -16,7 +16,9 @@ port(
 	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_to_mem : out std_logic;
-	rd_from_mem : out std_logic
+	rd_from_mem : out std_logic;
+	branch_i : in std_logic;
+	branch_o : out std_logic
 );
 end memory_access; 
 
@@ -82,6 +84,7 @@ BEGIN
 	
 	wr_to_mem <= wr;
 	rd_from_mem <= rd;
+	branch_o <= branch_i;
 
 END behaviour;
 
@@ -118,7 +121,7 @@ BEGIN
 		elsif clk'event and clk = '1' then
 		  addr_out    <= addr_in;
 		  rd_data_out <= rd_data_in;
-          reg3_addr_o	<= 	reg3_addr_i;  
+          reg3_addr_o	<= 	reg3_addr_i;
 		end if;
  end process;
 END behaviour;

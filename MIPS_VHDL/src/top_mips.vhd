@@ -63,7 +63,8 @@ port(
 	alu_ctrl : out std_logic_vector(2 downto 0);
 	alu_src : out std_logic;
 	wr_to_mem : out std_logic;
-	rd_from_mem : out std_logic
+	rd_from_mem : out std_logic;
+	branch : out std_logic
 );
 end component;
 
@@ -87,7 +88,9 @@ port(
 	wr_to_mem : in std_logic;
 	rd_from_mem : in std_logic;
 	memory_wr  : out std_logic;
-	memory_rd  : out std_logic
+	memory_rd  : out std_logic;
+	branch_i : in std_logic;
+	branch_o : out std_logic
 	);
 end component;
 
@@ -105,7 +108,9 @@ port(
 	wr_data : in std_logic_vector(MIPS_SIZE-1 downto 0);
 	rd_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_to_mem : out std_logic;
-	rd_from_mem : out std_logic
+	rd_from_mem : out std_logic;
+	branch_i : in std_logic;
+	branch_o : out std_logic
 );
 end component;   
 	
@@ -121,7 +126,8 @@ port(
 	wr_flag : out std_logic;
 	wr_data : out std_logic_vector(MIPS_SIZE-1 downto 0);
 	wr_mem_wb : in std_logic;
-	rd_mem_wb : in std_logic
+	rd_mem_wb : in std_logic;
+	branch : in std_logic
 
 );
 end component;
@@ -143,6 +149,7 @@ signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
 signal wr_flag_s,wb_ena_s              : std_logic;
 signal alu_src_s					   : std_logic;
 signal wr_to_mem_s, rd_from_mem_s : std_logic;
+signal branch_s : std_logic;
 
 
 
@@ -167,9 +174,11 @@ signal mem_wr                             : std_logic;
 signal mem_rd                             : std_logic;
 signal wr_mem_ma						  : std_logic;
 signal rd_mem_ma						  : std_logic;
+signal branch_sm						  : std_logic;
 	
 -- write_back
 signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 0);
+signal branch_mw						  : std_logic;
 
 --uart adapter signals
 signal uart_rd_ena_s								: std_logic;
@@ -211,7 +220,8 @@ port map(
 	alu_ctrl => alu_ctrl_s,
 	alu_src => alu_src_s,
 	wr_to_mem => wr_to_mem_s,
-	rd_from_mem => rd_from_mem_s
+	rd_from_mem => rd_from_mem_s,
+	branch => branch_s
 );			
 	
 execute_i : execute
@@ -234,7 +244,9 @@ port map(
 	memory_wr => mem_wr,
 	memory_rd => mem_rd,
 	wr_to_mem => wr_to_mem_s,
-	rd_from_mem => rd_from_mem_s
+	rd_from_mem => rd_from_mem_s,
+	branch_i => branch_s,
+	branch_o => branch_sm
 	);	
 
 memory_access_i : memory_access
@@ -251,7 +263,9 @@ port map(
 	wr_data => b_out_s,
 	rd_data => rd_data_s,
 	wr_to_mem => wr_mem_ma,
-	rd_from_mem => rd_mem_ma
+	rd_from_mem => rd_mem_ma,
+	branch_i => branch_sm,
+	branch_o => branch_mw
 );
 
 
@@ -267,7 +281,8 @@ port map(
 	wr_flag => wb_ena_s,
 	wr_data => r1_data_s,
 	wr_mem_wb => wr_mem_ma,
-	rd_mem_wb => rd_mem_ma
+	rd_mem_wb => rd_mem_ma,
+	branch => branch_mw
 );
 	
 	rd_ena  <= mem_rd;

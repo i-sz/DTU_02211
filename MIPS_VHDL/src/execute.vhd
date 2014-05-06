@@ -23,7 +23,9 @@ port(
 	wr_to_mem : in std_logic;
 	rd_from_mem : in std_logic;
 	memory_wr  : out std_logic;
-	memory_rd  : out std_logic
+	memory_rd  : out std_logic;
+	branch_i : in std_logic;
+	branch_o : out std_logic
 );
 end execute;
 
@@ -35,6 +37,7 @@ signal branch_address, jump_or_branch_address  : std_logic_vector(31 downto 0);
 --signals for the pipeline stage
 signal alu_result_p : std_logic_vector(31 downto 0);
 signal ctrl_p : std_logic_vector(2 downto 0);
+signal ab_test : std_logic;
 
 signal sign_extend_shifted : std_logic_vector(31 downto 0);
 
@@ -74,8 +77,12 @@ input_b <= B when (alu_src ='0') else sign_extend;
 --Branching 		
 
 sign_extend_shifted <= sign_extend(29 downto 0) & "00";
-branch_address <= std_logic_vector(unsigned(sign_extend_shifted));  
-jump_or_branch_address <= branch_address when (a = x"00000000" and pc_sel_in ='1') else sign_extend_shifted;
+branch_address <= std_logic_vector(unsigned(sign_extend_shifted));
+ab_test <= '1' when a = b else '0';
+jump_or_branch_address <= branch_address when ((a = x"00000000" and pc_sel_in ='1' and branch_i = '0') or (ab_test = '1' and branch_i ='1')) else pc_addr_in;
+						 
+
+
 
 --pipeline stage
 process(clk,rst)
@@ -88,6 +95,7 @@ begin
 		b_out <= (others => '0');
 		memory_wr  <= '0';
 		memory_rd  <= '0';
+		branch_o <= '0';
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
 		reg3_addr_o <= reg3_addr_i;
@@ -96,6 +104,7 @@ begin
 		b_out <= b;
 		memory_wr  <= wr_to_mem;
 		memory_rd  <= rd_from_mem;
+		branch_o <= branch_i;
 	end if;
 end process;	  
 		
