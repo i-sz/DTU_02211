@@ -13,7 +13,7 @@
 ; Simple + and - actions
 START:
 nop
-addi r01,r00,10
+addi r01,r01,10
 nop
 addi r02,r00,0
 nop
