@@ -9,63 +9,79 @@
 #
 # Reverses text from memory point 1 to X to memory point X+1 - X+X+1
 #
+
+;End of the line sign
+addi r03,r00,13
+addi r05,r00,5
+
+;For minus things
+addi r04,r00,1
+
+;Counter
 addi r01,r00,0
-addi r02,r00,10
-addi r03,r00,1
+
+;Read loop start
+;Read from UART
+READUART:
 nop
 nop
 nop
 nop
 nop
-FILL:
+lb r10,r00,1
+
 nop
 nop
 nop
 nop
 nop
-sb r01,r01,2
-beq r01,r02,REVERSE
-nop
-nop
-nop
+
+;Store to memory
+sb r10,r01,2
+
+;Check if line end
+;beq r10,r03,READMEM
+beq r01,r05,READMEM
+
+;Increase counter
 addi r01,r01,1
+
+;Jump back to read more
+jmp READUART
+;Read loop end
+
 nop
 nop
-nop
-nop
-nop
-jmp FILL
 nop
 nop
 nop
 
-REVERSE:
+;Read backwards loop start
+READMEM:
+lb r11,r01,2
+
 nop
 nop
 nop
 nop
 nop
-lb r05,r01,2
+
+;Write to UART
+sb r11,r00,0
+
 nop
 nop
 nop
 nop
 nop
-sb r05,r00,0
+
+;Check if line end (counter is zero)
 beq r01,r00,END
-nop
-nop
-sub r01,r01,r03
-jmp REVERSE
 
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+;Decrease counter
+sub r01,r01,r04
 
+jmp READMEM
 
 END:
 
