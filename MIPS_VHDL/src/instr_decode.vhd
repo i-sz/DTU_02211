@@ -152,6 +152,7 @@ port map(
 				when "100000" => --lb
 					rd_from_mem_s <= '1';
 					alu_ctrl_p <= "010";
+					wb_reg <= '1';
 				when "110000" => --sb
 					wr_to_mem_s <= '1';
                  	reg_3_p <= instr(25 downto 21); --r3data from r1

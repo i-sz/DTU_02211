@@ -42,54 +42,97 @@ nop
 nop
 nop
 
+
 COUNTERS:
 ;Define last register slot
 addi r09,r00,8
-;Counter
+;Counter for MEM point
 addi r10,r00,0
 ;Counter2
 addi r11,r00,0
+;Counter3
+addi r12,r00,0
+LOOP:
 nop
 nop
 nop
 nop
 nop
 
-LOOP:
+lb r05,r10,11
+nop
+nop
+nop
+nop
+nop
+lb r06,r10,12
+nop
+nop
+nop
+nop
+nop
+addi r01,r05,0
+addi r02,r06,0
+nop
+nop
+nop
+nop
+nop
+slt r03,r01,r02
+
+nop
+nop
+nop
+nop
+nop
+beq r03,r00,SWAP
+SWAPPED:
+
+beq r12,r09,END
+nop
+nop
+nop
+nop
+nop
+beq r10,r09,INC2
+nop
+nop
+nop
+jmp INC1
+nop
+nop
+
+
+INC2:
+nop
+nop
+nop
+addi r12,r12,1
+addi r10,r00,0
+nop
+nop
+nop
+nop
+nop
+jmp LOOP
+nop
+nop
+nop
+
+INC1:
+nop
+nop
+nop
+nop
 addi r10,r10,1
 nop
 nop
 nop
 nop
 nop
-lb r01,r10,10
-lb r02,r10,11
-
+jmp LOOP
 nop
 nop
-nop
-nop
-nop
-
-slt r03,r01,r02
-
-beq r11,r09,END
-nop
-nop
-nop
-nop
-nop
-addi r11,r11,1
-
-nop
-nop
-nop
-nop
-nop
-
-beq r03,r00,LOOP
-jmp SWAP
-
 
 SWAP:
 nop
@@ -97,32 +140,18 @@ nop
 nop
 nop
 nop
-addi r03,r01,0
+sb r02,r10,11
+nop
+nop
+sb r01,r10,12
 nop
 nop
 nop
 nop
 nop
-addi r01,r02,0
+jmp SWAPPED
 nop
 nop
-nop
-nop
-nop
-addi r02,r03,0
-nop
-nop
-nop
-nop
-nop
-sb r02,r10,10
-sb r01,r10,11
-nop
-nop
-nop
-nop
-nop
-jmp LOOP
 
 
 END:
@@ -130,5 +159,5 @@ END:
 nop
 nop
 nop
-addi r01,r00,1
+;addi r01,r00,1
 
