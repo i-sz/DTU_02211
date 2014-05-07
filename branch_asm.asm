@@ -17,11 +17,12 @@ addi r01,r00,10
 nop
 addi r02,r00,0
 nop
+LOOP:
 beq r01,r02,END
 nop
 addi r02,r02,1
 nop
-jmp START
+jmp LOOP
 END:
 nop
 nop
