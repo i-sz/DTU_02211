@@ -28,6 +28,7 @@ nop
 nop
 nop
 nop
+sb r02,r02,0
 addi r02,r02,1
 nop
 jmp LOOP
