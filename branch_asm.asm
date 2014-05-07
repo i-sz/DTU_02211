@@ -22,7 +22,7 @@ nop
 nop
 nop
 LOOP:
-beq r01,r02,END
+beq r01,r02,LOOP2IN
 nop
 nop
 nop
@@ -32,6 +32,32 @@ sb r02,r02,0
 addi r02,r02,1
 nop
 jmp LOOP
+nop
+nop
+nop
+LOOP2IN:
+addi r03,r02,0
+addi r02,r00,0
+nop
+nop
+nop
+nop
+nop
+LOOP2:
+beq r02,r03,END
+nop
+nop
+nop
+nop
+nop
+lb r04,r02,0
+addi r02,r02,1
+nop
+nop
+nop
+jmp LOOP2
+nop
+nop
 END:
 nop
 nop
