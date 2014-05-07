@@ -12,6 +12,7 @@
 
 ;End of the line sign
 addi r03,r00,13
+addi r05,r00,5
 
 ;For minus things
 addi r04,r00,1
@@ -34,7 +35,8 @@ nop
 sb r10,r01,2
 
 ;Check if line end
-beq r10,r03,READMEM
+;beq r10,r03,READMEM
+beq r01,r05,READMEM
 
 ;Increase counter
 addi r01,r01,1
