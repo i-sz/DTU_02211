@@ -79,9 +79,9 @@ input_b <= B when (alu_src ='0') else sign_extend;
 --Branching 		
 
 sign_extend_shifted <= sign_extend(29 downto 0) & "00";
-branch_address <= std_logic_vector(unsigned(pc_addr_in) + unsigned(sign_extend_shifted));
+branch_address <= std_logic_vector(unsigned(sign_extend_shifted));
 ab_test <= '1' when a = b else '0';
-jump_or_branch_address <= branch_address when (ab_test = '1' and branch_i ='1') else sign_extend;
+jump_or_branch_address <= branch_address when ((ab_test = '1' and branch_i ='1') or pc_sel_in = '1') else sign_extend;
 pc_sel_actual <= '1' when ((ab_test = '1' and branch_i ='1') or pc_sel_in = '1') else '0';						 
 
 
