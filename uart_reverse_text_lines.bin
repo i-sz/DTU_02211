@@ -1,21 +1,3 @@
-library ieee;
-use ieee.std_logic_1164.all;
-USE IEEE.numeric_std.ALL;
-
-entity Instr_Memory is
-  GENERIC (N:     NATURAL:= 32);  -- Width of inputs.
-  port (address : in std_logic_vector(N-1 downto 0);			
-		data    : out std_logic_vector(N-1 downto 0));
-end Instr_Memory;
-
-architecture behavioral of Instr_Memory is
-signal addr : integer range 0 to 4*50760;  
- 
-begin
-addr <= to_integer(unsigned(address));
-   process(addr) 
-	begin
-      case addr is 
        when 4*0    => data <= "10000100011000000000000000001101"; -- addi r03,r00,13
        when 4*1    => data <= "10000100101000000000000000000101"; -- addi r05,r00,5
        when 4*2    => data <= "10000100100000000000000000000001"; -- addi r04,r00,1
@@ -60,7 +42,3 @@ addr <= to_integer(unsigned(address));
        when 4*41   => data <= "00000000000000000000000000000000"; -- nop
        when 4*42   => data <= "00000000000000000000000000000000"; -- nop
        when 4*43   => data <= "00000000000000000000000000000000"; -- nop
-	    when others => data <= "00000000000000000000000000000000"; 
-       end case;
-	end process;
-end behavioral;
