@@ -51,9 +51,7 @@ ARCHITECTURE behaviour OF memory_access IS
 		reg3_addr_i : in  std_logic_vector(4 downto 0);
 	    reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb	
 		addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-		rd_data_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-		rd_data_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
+		addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
 	);
 	end COMPONENT;
   
@@ -79,29 +77,28 @@ BEGIN
 		reg3_addr_i => reg3_addr_i,
 		reg3_addr_o => reg3_addr_o,
 		addr_in => addr_in,
-		addr_out => addr_out,
-		rd_data_in => rd_data_s,
-		rd_data_out => rd_data
+		addr_out => addr_out
+		
 	);
 	
+	
+	rd_data <= rd_data_s;
 	
 	process (clk,rst)
 	begin 
 	if (rst = '1') then
 		  wr_to_mem    <= '0';
-		  rd_s <= '0';
+		  
 		  rd_from_mem <= '0';
 		  branch_o <= '0';
-		  wb_reg_i_s <='0';
+		  
 		  wb_reg_o <=  '0';
 		  
 		elsif clk'event and clk = '1' then
 			wr_to_mem <= wr;
-			rd_s <= rd;
-			rd_from_mem <= rd_s;
+			rd_from_mem <= rd;
 			branch_o <= branch_i;
-			wb_reg_i_s <= wb_reg_i;
-			wb_reg_o <= wb_reg_i_s;
+			wb_reg_o <= wb_reg_i;
 		end if;
 
     end process;
@@ -121,9 +118,7 @@ port(
     reg3_addr_i : in  std_logic_vector(4 downto 0);
 	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb		
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0);
-	rd_data_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
-	rd_data_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
+	addr_out : out std_logic_vector(MIPS_SIZE-1 downto 0)
 );
 end MEM_WB_regs; 
 
@@ -135,11 +130,11 @@ BEGIN
   begin
 	  if (rst = '1') then
 		  addr_out    <= (others => '0');
-		  rd_data_out <= (others => '0');
+		  
 		  reg3_addr_o <= (others => '0');
 		elsif clk'event and clk = '1' then
 		  addr_out    <= addr_in;
-		  rd_data_out <= rd_data_in;
+		  
           reg3_addr_o	<= 	reg3_addr_i;
 		end if;
  end process;
