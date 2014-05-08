@@ -58,7 +58,7 @@ ARCHITECTURE behaviour OF memory_access IS
 	end COMPONENT;
   
    signal rd_data_s : std_logic_vector(MIPS_SIZE-1 downto 0);
-  
+   signal rd_s : std_logic; 
 BEGIN
 
 	Data_Mem_RAM: Data_Memory 
@@ -94,7 +94,8 @@ BEGIN
 		  wb_reg_o <=  '0';
 		elsif clk'event and clk = '1' then
 			wr_to_mem <= wr;
-			rd_from_mem <= rd;
+			rd_s <= rd;
+			rd_from_mem <= rd_s;
 			branch_o <= branch_i;
 			wb_reg_o <= wb_reg_i;
 		end if;
