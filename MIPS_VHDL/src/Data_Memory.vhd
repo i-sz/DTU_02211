@@ -31,7 +31,7 @@ BEGIN
 	BEGIN
 		IF (rst = '1') THEN --- reset---
 		   for j in 0 to 2**RAM_SIZE-1 loop
-					block_ram(j) <= (others => '1');
+					block_ram(j) <= (others => '0');
 		    end loop;
 		elsif rising_edge(clk) then
 			----write----

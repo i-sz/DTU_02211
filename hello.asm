@@ -58,7 +58,7 @@ addi r11,r00,100
 addi r12,r00,33
 #r12 = !
 ; sb r12,r00,0
-
+START:
 sb r01,r00,0
 nop
 sb r02,r00,0
@@ -85,5 +85,5 @@ sb r12,r00,0
 nop
 END:
 nop
-jmp END
+jmp START
 nop

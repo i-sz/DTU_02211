@@ -35,6 +35,12 @@ nop
 nop
 nop
 nop
+beq r00,r10,READUART
+nop
+nop
+nop
+nop
+nop
 
 ;Store to memory
 sb r10,r01,2
@@ -42,10 +48,19 @@ sb r10,r01,2
 ;Check if line end
 ;beq r10,r03,READMEM
 beq r01,r05,READMEM
+nop
+nop
+nop
+nop
+nop
 
 ;Increase counter
 addi r01,r01,1
-
+nop
+nop
+nop
+nop
+nop
 ;Jump back to read more
 jmp READUART
 ;Read loop end
@@ -58,6 +73,11 @@ nop
 
 ;Read backwards loop start
 READMEM:
+nop
+nop
+nop
+nop
+nop
 lb r11,r01,2
 
 nop
@@ -77,10 +97,18 @@ nop
 
 ;Check if line end (counter is zero)
 beq r01,r00,END
-
+nop
+nop
+nop
+nop
+nop
 ;Decrease counter
 sub r01,r01,r04
-
+nop
+nop
+nop
+nop
+nop
 jmp READMEM
 
 END:
