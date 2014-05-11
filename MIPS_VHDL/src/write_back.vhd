@@ -17,6 +17,10 @@ port(
 	wr_mem_wb : in std_logic;
 	rd_mem_wb : in std_logic;
 	branch : in std_logic;
+	data_in_uart_ma: in std_logic_vector(MIPS_SIZE-1 downto 0);
+	data_in_uart_wb: out std_logic_vector(MIPS_SIZE-1 downto 0);
+	rd_ena_uart_ma : in std_logic;
+	rd_ena_uart_wb : out std_logic;
 	wb_reg_i : in std_logic
 
 );
@@ -47,5 +51,18 @@ process (clk, rst, alu_result, wr_reg_in, rd_data, wr_mem_wb, rd_mem_wb )
        	   
 	end if;
   end process;
+
+  
+process(clk, rst)
+begin
+	if (rst = '1') then
+		data_in_uart_wb <= (others => '0');
+		rd_ena_uart_wb <= '0';
+	elsif clk'event and clk = '1' then
+		data_in_uart_wb <= data_in_uart_ma;
+		rd_ena_uart_wb <= rd_ena_uart_ma;
+	end if;	
+end process;	
+		
 
 END behaviour;
