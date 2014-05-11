@@ -27,6 +27,10 @@ port(
 	branch_i : in std_logic;
 	branch_o : out std_logic;
 	wb_reg_i : in std_logic; -- write back flag to register file
+	data_in_uart : in std_logic_vector(31 downto 0);
+	data_in_uart_ex : out std_logic_vector(31 downto 0);
+	rd_ena_uart_id :in std_logic;
+	rd_ena_uart_ex : out std_logic;	
 	wb_reg_o : out std_logic
 );
 end execute;
@@ -99,6 +103,8 @@ begin
 		memory_rd  <= '0';
 		branch_o <= '0';
 		wb_reg_o <= '0';
+		rd_ena_uart_ex <= '0';
+		data_in_uart_ex <= (others => '0');
 	elsif rising_edge(CLK) then 
 		alu_result <= alu_result_p;
 		reg3_addr_o <= reg3_addr_i;
@@ -109,6 +115,8 @@ begin
 		memory_rd  <= rd_from_mem;
 		branch_o <= branch_i;
 		wb_reg_o  <= wb_reg_i;
+		rd_ena_uart_ex <= rd_ena_uart_id;
+		data_in_uart_ex <= data_in_uart;
 	end if;
 end process;	  
 		
