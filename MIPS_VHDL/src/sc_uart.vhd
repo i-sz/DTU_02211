@@ -64,7 +64,7 @@ use ieee.numeric_std.all;
 entity sc_uart is
 
 	generic (addr_bits : integer := 2;
-			 clk_freq : integer := 10_000_000;
+			 clk_freq : integer := 50_000_000;
 			 baud_rate : integer := 115200;
 			 txf_depth : integer := 4; 
 			 txf_thres : integer := 2;
