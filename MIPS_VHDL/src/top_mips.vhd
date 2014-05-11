@@ -65,6 +65,8 @@ port(
 	wr_to_mem : out std_logic;
 	rd_from_mem : out std_logic;
 	branch : out std_logic;
+	rd_ena_uart : in std_logic;
+	rd_ena_uart_id : out std_logic;
     wb_reg_o : out std_logic
 );
 end component;
@@ -93,6 +95,10 @@ port(
 	branch_i : in std_logic;
 	branch_o : out std_logic;
 	wb_reg_i : in std_logic;
+	data_in_uart : in std_logic_vector(31 downto 0);
+	data_in_uart_ex : out std_logic_vector(31 downto 0);
+	rd_ena_uart_id :in std_logic;
+	rd_ena_uart_ex : out std_logic;	
 	wb_reg_o : out std_logic
 	
 	);
@@ -105,6 +111,10 @@ port(
 	rst : in std_logic;
    wr  : in std_logic;
 	rd  : in std_logic;
+		rd_ena_uart : in std_logic;
+	rd_ena_uart_ma : out std_logic;
+	data_in_uart_ex : in  std_logic_vector(MIPS_SIZE-1 downto 0);   --coming directly from the top input of the uart data output
+--	data_in_uart_ma : out  std_logic_vector(MIPS_SIZE-1 downto 0);   --coming directly from the top input of the uart data output
    reg3_addr_i : in  std_logic_vector(4 downto 0);
 	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb	
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -134,6 +144,10 @@ port(
 	wr_mem_wb : in std_logic;
 	rd_mem_wb : in std_logic;
 	branch : in std_logic;
+	data_in_uart_ma: in std_logic_vector(MIPS_SIZE-1 downto 0);
+	data_in_uart_wb: out std_logic_vector(MIPS_SIZE-1 downto 0);
+		rd_ena_uart_ma : in std_logic;
+	rd_ena_uart_wb : out std_logic;
 	wb_reg_i : in std_logic
 
 );
@@ -160,6 +174,8 @@ signal wb_reg_s0,wb_reg_s1,wb_reg_s2 : std_logic;
 
 signal branch_s : std_logic;
 
+signal uart_rd_ena_s								: std_logic;
+
 
 
 
@@ -173,6 +189,8 @@ signal reg1_addr_id_s					 : std_logic_vector(ADDR_SIZE-1 downto 0);
 
 signal pc_sel_ss : std_logic;
 signal b_out_s : std_logic_vector(31 downto 0);
+
+signal uart_rd_ena_ss								: std_logic;
 	
 -- memory_access
 signal pc_addr_stage4                     : std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -184,13 +202,15 @@ signal mem_rd                             : std_logic;
 signal wr_mem_ma						  : std_logic;
 signal rd_mem_ma						  : std_logic;
 signal branch_sm						  : std_logic;
+signal uart_rd_ena_sss								: std_logic;
+signal data_in_uart_s					: std_logic_vector(MIPS_SIZE-1 downto 0);
 	
 -- write_back
 signal wr_reg_stage5                      : std_logic_vector(ADDR_SIZE-1 downto 0);
 signal branch_mw						  : std_logic;
-
+signal data_in_uart_ss					  : std_logic_vector(MIPS_SIZE-1 downto 0);	
 --uart adapter signals
-signal uart_rd_ena_s								: std_logic;
+signal uart_rd_ena_ssss								: std_logic;
 signal data_in_s									: std_logic_vector(31 downto 0);	
 signal addr_in_s                      : std_logic_vector(ADDR_SIZE-1 downto 0);
 
@@ -220,7 +240,7 @@ port map(
 	reg_3_data => r3_s,
 	wr_flag => wr_flag_s, 
 	reg1_wb_addr => addr_in_s, -- coming from wb r1_addr_s
-	reg1_wb_data => data_in_s, -- coming from wb r1_data_s
+	reg1_wb_data => r1_data_s, -- coming from wb r1_data_s
 	reg_1_addr => reg1_addr_id_s,  -- going to execution
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
@@ -231,6 +251,8 @@ port map(
 	wr_to_mem => wr_to_mem_s,
 	rd_from_mem => rd_from_mem_s,
 	branch => branch_s,
+	rd_ena_uart => uart_rd_ena,
+	rd_ena_uart_id => uart_rd_ena_s,
     wb_reg_o => wb_reg_s0
 );			
 	
@@ -257,6 +279,10 @@ port map(
 	rd_from_mem => rd_from_mem_s,
 	branch_i => branch_s,
 	branch_o => branch_sm,
+	data_in_uart => data_in,
+	data_in_uart_ex => data_in_s,
+	rd_ena_uart_id => uart_rd_ena,
+	rd_ena_uart_ex => uart_rd_ena_ss,
 	wb_reg_i => wb_reg_s0,
     wb_reg_o => wb_reg_s1
 	);	
@@ -268,6 +294,10 @@ port map(
 	rst => reset,
     wr => mem_wr,
 	rd => mem_rd,
+    rd_ena_uart => uart_rd_ena_ss,   --from uart directly
+	rd_ena_uart_ma => uart_rd_ena_sss,
+	data_in_uart_ex => data_in,    --data from uart
+--	data_in_uart_ma => data_in_uart_s,  	
 	reg3_addr_i => reg1_addr_ex_s,
 	reg3_addr_o => reg1_addr_ex_s1,
 	addr_in => alu_output_s, 
@@ -297,6 +327,10 @@ port map(
 	wr_mem_wb => wr_mem_ma,
 	rd_mem_wb => rd_mem_ma,
 	branch => branch_mw,
+	data_in_uart_ma => data_in_uart_s,
+	data_in_uart_wb => data_in_uart_ss,  --uart data from the second pipeline stage
+    rd_ena_uart_ma => uart_rd_ena_sss,
+	rd_ena_uart_wb => uart_rd_ena_ssss,
 	wb_reg_i => wb_reg_s2
 );
 	
@@ -304,7 +338,6 @@ port map(
     wr_ena <= mem_wr;
     addr_adapter <= alu_output_s(4 downto 0);
     data_out <= b_out_s;
-    data_in_s <= data_in when (uart_rd_ena='1') else r1_data_s;
     addr_in_s <= r1_addr_s;
 	wr_flag_s <= wb_ena_s;
    	
