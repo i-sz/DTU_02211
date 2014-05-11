@@ -35,7 +35,7 @@ architecture behav of uart_adapter is
 	
     uart_wr_ena <= mem_wr_ena;
     uart_rd_ena <= mem_rd_ena;
-    uart_addr <=  "01" when (mem_address(1 downto 0) = "00") else "01" ;
+    uart_addr <=  "01" when (mem_address(1 downto 0) = "00") else "00" ;  --when we write to uart
     uart_wr_data <= mem_data_in;
 	to_proc_data_in <= uart_rd_data;
     uart_rdy_cnt_s <= uart_rdy_cnt;
