@@ -20,6 +20,9 @@ addi r04,r00,1
 ;Counter
 addi r01,r00,0
 
+;h
+addi r06,r00,104
+
 ;Read loop start
 ;Read from UART
 READUART:
@@ -29,9 +32,18 @@ nop
 nop
 nop
 lb r10,r00,1
-
 nop
 nop
+nop
+nop
+nop
+beq r10,r06,READMEM
+nop
+nop
+nop
+nop
+nop
+jmp READUART
 nop
 nop
 nop
