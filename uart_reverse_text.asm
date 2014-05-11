@@ -11,17 +11,29 @@
 #
 
 ;End of the line sign
-addi r03,r00,13
-addi r05,r00,5
+;addi r03,r00,13
+nop
+nop
+nop
+nop
+nop
+sb r20,r00,5
+nop
+nop
+nop
+nop
+nop
+lb r10,r00,5
+;addi r05,r00,5
 
 ;For minus things
-addi r04,r00,1
+;addi r04,r00,1
 
 ;Counter
-addi r01,r00,0
+;addi r01,r00,0
 
 ;h
-addi r06,r00,104
+;addi r06,r00,104
 
 ;Read loop start
 ;Read from UART
