@@ -9,6 +9,10 @@ port(
 	rst : in std_logic;
 	wr  : in std_logic;
 	rd  : in std_logic;
+	rd_ena_uart : in std_logic;
+	rd_ena_uart_ma : out std_logic;
+	data_in_uart_ex : in  std_logic_vector(MIPS_SIZE-1 downto 0);   --coming directly from the top input of the uart data output
+--	data_in_uart_ma : out  std_logic_vector(MIPS_SIZE-1 downto 0);   --coming directly from the top input of the uart data output
 	reg3_addr_i : in  std_logic_vector(4 downto 0);
 	reg3_addr_o : out  std_logic_vector(4 downto 0); -- decide if wb is needed and pass the address to wb	
 	addr_in : in std_logic_vector(MIPS_SIZE-1 downto 0);
@@ -82,7 +86,9 @@ BEGIN
 	);
 	
 	
-	rd_data <= rd_data_s;
+	rd_data <= rd_data_s when rd_ena_uart = '0' else data_in_uart_ex;
+	
+	
 	
 	process (clk,rst)
 	begin 
@@ -91,14 +97,16 @@ BEGIN
 		  
 		  rd_from_mem <= '0';
 		  branch_o <= '0';
-		  
+		  --data_in_uart_ma <= (others => '0');
 		  wb_reg_o <=  '0';
-		  
+		 -- rd_ena_uart_ma <= '0';
 		elsif clk'event and clk = '1' then
+		--	data_in_uart_ma <= data_in_uart;
 			wr_to_mem <= wr;
 			rd_from_mem <= rd;
 			branch_o <= branch_i;
 			wb_reg_o <= wb_reg_i;
+		--	rd_ena_uart_ma <= rd_ena_uart;
 		end if;
 
     end process;
