@@ -32,13 +32,12 @@ end uart_adapter;
 architecture behav of uart_adapter is
     signal uart_rdy_cnt_s : std_logic_vector(1 downto 0);
 	begin
-	
+
     uart_wr_ena <= mem_wr_ena;
     uart_rd_ena <= mem_rd_ena;
-    uart_addr <=  "01" when (mem_address(1 downto 0) = "00") else 
-						"00" when (mem_address(3 downto 0) >= "0001") and (mem_address(4 downto 0) < "10001") else "00";    --when we write to uart
+    uart_addr <=  "01" when (mem_address(1 downto 0) = "00") else "00" ;  --when we write to uart
     uart_wr_data <= mem_data_in;
-	 to_proc_data_in <= uart_rd_data;
+	to_proc_data_in <= uart_rd_data;
     uart_rdy_cnt_s <= uart_rdy_cnt;
-    to_proc_rd_ena <= '1' when ((mem_address(3 downto 0) >= "0001") and (mem_address(4 downto 0) < "10001")) else '0';
+    to_proc_rd_ena <= '1' when (mem_address(1 downto 0) = "01") else '0';
 end behav;
