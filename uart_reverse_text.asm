@@ -91,7 +91,7 @@ nop
 nop
 nop
 lb r11,r01,2
-
+OUTPUT:
 nop
 nop
 nop
@@ -106,7 +106,12 @@ nop
 nop
 nop
 nop
-
+jmp OUTPUT
+nop
+nop
+nop
+nop
+nop
 ;Check if line end (counter is zero)
 beq r01,r00,END
 nop
