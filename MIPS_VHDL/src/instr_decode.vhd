@@ -31,6 +31,8 @@ GENERIC (MIPS_SIZE: NATURAL:= 32; ADDR_SIZE: NATURAL:= 5);
 	wr_to_mem : out std_logic;
 	rd_from_mem : out std_logic;
 	branch : out std_logic;
+	rd_ena_uart : in std_logic;
+	rd_ena_uart_id : out std_logic;
 	wb_reg_o : out std_logic
 );
 end instr_decode;
@@ -175,6 +177,7 @@ port map(
 			rd_from_mem <= '0';
 			branch <= '0';
 			wb_reg_o <= '0';
+			rd_ena_uart_id <= '0';
 		elsif rising_edge(clk) then 
 			reg_2_data <= reg_2data;
 			reg_3_data <= reg_3data;
@@ -188,6 +191,7 @@ port map(
 			rd_from_mem <= rd_from_mem_s;
 			branch <= branch_s;
 			wb_reg_o <= wb_reg;
+			rd_ena_uart_id <= rd_ena_uart;
 		end if;
 	end process;
 end behaviour;
