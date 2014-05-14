@@ -40,6 +40,7 @@ addi r06,r00,104
 ;Read loop start
 ;Read from UART
 READUART:
+addi r20,r00,10000
 nop
 nop
 nop
@@ -51,22 +52,22 @@ nop
 nop
 nop
 nop
-beq r10,r06,OUTPUT
+; beq r10,r06,OUTPUT
 nop
 nop
 nop
 nop
+; nop
+; jmp LOOP2
+; nop
+; nop
+; nop
+; OUTPUT:
+; addi r20,r00,10000
 nop
-jmp READUART
 nop
 nop
-nop
-OUTPUT:
-addi r20,r00,10000
-nop
-nop
-nop
-sb r06,r00,0
+sb r10,r00,0
 ;beq r00,r10,READUART
 nop
 nop
@@ -160,7 +161,7 @@ nop
 
 
 LOOP:
-beq r20,r00,OUTPUT
+beq r20,r00,READUART
 nop
 nop
 nop
@@ -186,6 +187,34 @@ jmp LOOP
 nop
 nop
 
+nop
+nop
+LOOP2:
+beq r20,r00,READUART
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+sub r20,r20,r21
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+jmp LOOP2
+nop
+nop
 ; ;# Initialize counter
 ; addi r01,r00,2
 ; ;# End of string character (Carriage return)

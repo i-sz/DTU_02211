@@ -294,7 +294,7 @@ port map(
 	rst => reset,
     wr => mem_wr,
 	rd => mem_rd,
-    rd_ena_uart => uart_rd_ena_ss,   --from uart directly
+    rd_ena_uart => uart_rd_ena,   --from uart directly
 	rd_ena_uart_ma => uart_rd_ena_sss,
 	data_in_uart_ex => data_in,    --data from uart
 --	data_in_uart_ma => data_in_uart_s,  	
