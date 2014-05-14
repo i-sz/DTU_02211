@@ -30,14 +30,26 @@ port(
 end uart_adapter;
 
 architecture behav of uart_adapter is
-    signal uart_rdy_cnt_s : std_logic_vector(1 downto 0);
+    signal uart_rdy_cnt_s    : std_logic_vector(1 downto 0);
+	signal to_proc_rd_ena_s  : std_logic;
+	signal to_proc_data_in_s : std_logic_vector(31 downto 0);
 	begin
-
+process (clk,rst)
+	begin 
+	  if (rst = '1') then
+		to_proc_rd_ena <= '0';	
+		to_proc_data_in<= (others => '0');  
+	  elsif clk'event and clk = '1' then
+	    to_proc_rd_ena <= to_proc_rd_ena_s;	
+		to_proc_data_in<= to_proc_data_in_s;
+	  end if;
+	end process;
+	
     uart_wr_ena <= mem_wr_ena;
     uart_rd_ena <= mem_rd_ena;
-    uart_addr <=  "01" when (mem_address(1 downto 0) = "00") else "00" ;  --when we write to uart
+    uart_addr <=  "01" when (mem_address(4 downto 0) = "00000") else "00" ;  --when we write to uart
     uart_wr_data <= mem_data_in;
-	to_proc_data_in <= x"00000068"; --uart_rd_data;
+	to_proc_data_in_s  <= x"00000068"; --uart_rd_data;
     uart_rdy_cnt_s <= uart_rdy_cnt;
-    to_proc_rd_ena <= '1' when (mem_address(1 downto 0) = "01" and mem_rd_ena = '1' ) else '0';
+    to_proc_rd_ena_s <= '1' when (mem_address(4 downto 0) = "00001" and mem_rd_ena = '1' ) else '0';
 end behav;
