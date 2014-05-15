@@ -330,7 +330,22 @@ nop
 nop
 nop
 nop
-
+;end of line (carriage return)
+O9:
+addi r23,r00,13
+nop
+nop
+nop
+nop
+nop
+addi r20,r00,2
+sb r23,r00,0
+jmp LOOP9
+nop
+nop
+nop
+nop
+nop
 nop
 nop
 
@@ -338,23 +353,7 @@ LOOP1:
 beq r20,r00,O2
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP1
@@ -365,23 +364,7 @@ LOOP2:
 beq r20,r00,O3
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP2
@@ -392,23 +375,7 @@ LOOP3:
 beq r20,r00,O4
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP3
@@ -419,23 +386,7 @@ LOOP4:
 beq r20,r00,O5
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP4
@@ -446,23 +397,7 @@ LOOP5:
 beq r20,r00,O6
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP5
@@ -473,23 +408,7 @@ LOOP6:
 beq r20,r00,O7
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP6
@@ -500,23 +419,7 @@ LOOP7:
 beq r20,r00,O8
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 nop
 nop
 jmp LOOP7
@@ -524,29 +427,24 @@ nop
 nop
 
 LOOP8:
-beq r20,r00,LOOP
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+beq r20,r00,O9
 nop
 nop
 sub r20,r20,r21
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
 jmp LOOP8
+nop
+nop
+
+LOOP9:
+beq r20,r00,LOOP
+nop
+nop
+sub r20,r20,r21
+nop
+nop
+jmp LOOP9
 nop
 nop
 

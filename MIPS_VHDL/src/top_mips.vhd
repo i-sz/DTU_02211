@@ -163,7 +163,7 @@ signal instr_s                         : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal wr_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r2_s,r3_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal r1_addr_s                       : std_logic_vector(ADDR_SIZE-1 downto 0);
-signal r1_data_s                       : std_logic_vector(MIPS_SIZE-1 downto 0);
+signal r1_data_s,r1_data_ss            : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal pc_addr_stage2                  : std_logic_vector(MIPS_SIZE-1 downto 0);
 signal sign_extend_s                   : std_logic_vector(31 downto 0);
 signal alu_ctrl_s                      : std_logic_vector(2 downto 0);
@@ -240,7 +240,7 @@ port map(
 	reg_3_data => r3_s,
 	wr_flag => wr_flag_s, 
 	reg1_wb_addr => addr_in_s, -- coming from wb r1_addr_s
-	reg1_wb_data => r1_data_s, -- coming from wb r1_data_s
+	reg1_wb_data => r1_data_ss, -- 
 	reg_1_addr => reg1_addr_id_s,  -- going to execution
 	pc_addr_in => pc_addr_stage1,
 	pc_addr_out => pc_addr_stage2,
@@ -334,7 +334,8 @@ port map(
 	wb_reg_i => wb_reg_s2
 );
 	
-	rd_ena  <= mem_rd;
+	r1_data_ss <= r1_data_s when uart_rd_ena = '0' else data_in;
+	rd_ena  <= rd_mem_ma;
     wr_ena <= mem_wr;
     addr_adapter <= alu_output_s(4 downto 0);
     data_out <= b_out_s;

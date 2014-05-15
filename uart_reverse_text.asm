@@ -52,9 +52,16 @@ nop
 nop
 nop
 nop
-; beq r10,r06,OUTPUT
+;beq r10,r00,LOOP
 nop
 nop
+addi r20,r00,10000
+nop
+nop
+nop
+nop
+nop
+jmp OLOOP
 nop
 nop
 ; nop
@@ -64,6 +71,7 @@ nop
 ; nop
 ; OUTPUT:
 ; addi r20,r00,10000
+OUTPUT:
 nop
 nop
 nop
@@ -72,7 +80,7 @@ sb r10,r00,0
 nop
 nop
 nop
-jmp LOOP
+jmp READUART
 nop
 nop
 
@@ -189,8 +197,8 @@ nop
 
 nop
 nop
-LOOP2:
-beq r20,r00,READUART
+OLOOP:
+beq r20,r00,OUTPUT
 nop
 nop
 nop
@@ -212,7 +220,7 @@ nop
 nop
 nop
 nop
-jmp LOOP2
+jmp OLOOP
 nop
 nop
 ; ;# Initialize counter

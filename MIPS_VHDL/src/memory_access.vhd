@@ -86,7 +86,7 @@ BEGIN
 	);
 	
 	
-	rd_data <= rd_data_s when rd_ena_uart = '0' else data_in_uart_ex;
+	rd_data <= rd_data_s;-- when rd_ena_uart = '0' else data_in_uart_ex;
 	
 	
 	
