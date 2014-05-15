@@ -10,7 +10,7 @@
 # Reverses text from memory point 1 to X to memory point X+1 - X+X+1
 #
 
-addi r21,r00,1
+;addi r21,r00,1
 ;End of the line sign
 ;addi r03,r00,13
 ; nop
@@ -33,196 +33,204 @@ addi r21,r00,1
 
 ;Counter
 ;addi r01,r00,0
-
+addi r12,r00,1
 ;h
-addi r06,r00,104
-
-;Read loop start
-;Read from UART
-READUART:
-addi r20,r00,10000
+START:
+lb r11,r00,2
+nop
+nop
+nop
+nop
+nop
+beq r11,r12,START
 nop
 nop
 nop
 nop
 nop
 lb r10,r00,1
-lb r10,r00,1
-lb r10,r00,1
 nop
 nop
 nop
 nop
 nop
+addi r10,r10,10
 ;beq r10,r00,LOOP
 nop
 nop
-addi r20,r00,10000
+;addi r20,r00,10000
 nop
-nop
-nop
-nop
-nop
-jmp OLOOP
-nop
-nop
-; nop
-; jmp LOOP2
-; nop
-; nop
-; nop
-; OUTPUT:
-; addi r20,r00,10000
-OUTPUT:
 nop
 nop
 nop
 sb r10,r00,0
-;beq r00,r10,READUART
+nop
+jmp END
 nop
 nop
-nop
-jmp READUART
-nop
-nop
-
-; ;Store to memory
-; sb r10,r01,2
-
-; ;Check if line end
-; ;beq r10,r03,READMEM
-; beq r01,r05,READMEM
-; nop
-; nop
-; nop
-; nop
-; nop
-
-; ;Increase counter
-; addi r01,r01,1
-; nop
-; nop
-; nop
-; nop
-; nop
-; ;Jump back to read more
-; jmp READUART
-; ;Read loop end
-
-; nop
-; nop
-; nop
-; nop
-; nop
-
-; ;Read backwards loop start
-; READMEM:
-; nop
-; nop
-; nop
-; nop
-; nop
-; lb r11,r01,2
+; ; nop
+; ; jmp LOOP2
+; ; nop
+; ; nop
+; ; nop
+; ; OUTPUT:
+; ; addi r20,r00,10000
 ; OUTPUT:
 ; nop
 ; nop
 ; nop
+; sb r10,r00,0
+; ;beq r00,r10,READUART
+; nop
+; nop
+; nop
+; jmp READUART
 ; nop
 ; nop
 
-; ;Write to UART
-; sb r11,r00,0
+; ; ;Store to memory
+; ; sb r10,r01,2
+
+; ; ;Check if line end
+; ; ;beq r10,r03,READMEM
+; ; beq r01,r05,READMEM
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+
+; ; ;Increase counter
+; ; addi r01,r01,1
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; ;Jump back to read more
+; ; jmp READUART
+; ; ;Read loop end
+
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+
+; ; ;Read backwards loop start
+; ; READMEM:
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; lb r11,r01,2
+; ; OUTPUT:
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+
+; ; ;Write to UART
+; ; sb r11,r00,0
+
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; jmp OUTPUT
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; ;Check if line end (counter is zero)
+; ; beq r01,r00,END
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; ;Decrease counter
+; ; sub r01,r01,r04
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; jmp READMEM
+
+; ; END:
+
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+; ; nop
+
+
+
+; LOOP:
+; beq r20,r00,READUART
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; sub r20,r20,r21
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; nop
+; jmp LOOP
+; nop
+; nop
 
 ; nop
 ; nop
-; nop
-; nop
-; nop
-; jmp OUTPUT
-; nop
-; nop
-; nop
-; nop
-; nop
-; ;Check if line end (counter is zero)
-; beq r01,r00,END
+; OLOOP:
+; beq r20,r00,OUTPUT
 ; nop
 ; nop
 ; nop
 ; nop
 ; nop
-; ;Decrease counter
-; sub r01,r01,r04
 ; nop
 ; nop
 ; nop
 ; nop
 ; nop
-; jmp READMEM
-
-; END:
-
+; sub r20,r20,r21
 ; nop
 ; nop
 ; nop
 ; nop
 ; nop
-
-
-
-LOOP:
-beq r20,r00,READUART
+; nop
+; nop
+; nop
+; nop
+; nop
+; jmp OLOOP
+; nop
+; nop
+END:
 nop
+jmp END
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-jmp LOOP
-nop
-nop
-
-nop
-nop
-OLOOP:
-beq r20,r00,OUTPUT
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-sub r20,r20,r21
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-jmp OLOOP
 nop
 nop
 ; ;# Initialize counter

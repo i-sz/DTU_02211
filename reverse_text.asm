@@ -10,116 +10,113 @@
 # Reverses text from memory point 1 to X to memory point X+1 - X+X+1
 #
 addi r01,r00,0
-addi r02,r00,10
+addi r02,r00,1
 addi r03,r00,1
+addi r13,r00,1
+addi r14,r00,3
+addi r15,r00,46
+addi r27,r00,20
+;h
+START:
+lb r11,r00,2
 nop
 nop
 nop
 nop
 nop
-FILL:
+beq r11,r13,START
+nop
+nop
+nop
+lb r10,r00,1
 nop
 nop
 nop
 nop
 nop
-sb r01,r01,2
-beq r01,r02,REVERSE
+beq r11,r12,START
 nop
+nop
+beq r11,r15,GOOUTPUT
+nop
+nop
+beq r01,r27,GOOUTPUT
 nop
 nop
 addi r01,r01,1
+addi r12,r11,0
 nop
 nop
 nop
 nop
 nop
-jmp FILL
+sb r10,r01,10
+jmp START
 nop
 nop
 nop
 
-REVERSE:
+GOOUTPUT:
+addi r16,r01,0
 nop
 nop
 nop
 nop
 nop
-lb r05,r01,2
+jmp OUTPUT
 nop
 nop
 nop
 nop
-nop
-sb r05,r00,0
-beq r01,r00,END
-nop
-nop
+OUTPUT:
+lb r10,r01,10
 sub r01,r01,r03
-jmp REVERSE
+addi r20,r00,10000
+nop
+nop
+nop
+sb r10,r00,0
+beq r00,r01,END
+nop
+nop
+nop
+jmp LOOP
+nop
+nop
+
+
+
+
+LOOP:
+beq r20,r00,OUTPUT
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+sub r20,r20,r03
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+jmp LOOP
+nop
+nop
+
 
 nop
 nop
-nop
-nop
-nop
-nop
-nop
-
-
 END:
-
 nop
 nop
-nop
-nop
-nop
-
-
-
-
-; ;# Initialize counter
-; addi r01,r00,2
-; ;# End of string character (Carriage return)
-; addi r03,r00,13
-; ;# GETLENGTH
-; ;# Read from counter point mem
-; lb r02,r01,00
-; ;# Skip to READANDREVERSE if Carriage return
-; beq r02,r03,3
-; ;# Increase counter r01
-; addi r01,r01,1
-; ;# Jump back to GETLENGTH
-; jmp -3
-; ;# READANDREVERSE
-; ;# END OF getting string length
-; ;# String length in r01
-; ;# Starting point for writing mem in r04
-; addi r04,r01,1
-; ;# Starting point for reversed string initialized in r05
-; add r05,r04,r00
-; ;#start position for mem in r04 anr r05
-; ;#READWRITE
-; ; Load from the end of the string to r10 (r01 is the last char at first)
-; lb r10,r01,0
-; ; Decrease counter r01
-; addi r01,r01,-1
-; ; Store r10 to a new memory point r04
-; sb r10,r04,0
-; ; Increase counter r04
-; addi r04,r04,1
-; ; Skip to loading characters to a r31 (LOADTO31) if Carriage return
-; beq r10,r03,2
-; ; Jump back to READWRITE
-; jmp -5
-; ; LOADTO31
-; ;# put to r31 where it will be outputted
-; lb r31,r05,0
-; ; Increase counter r05
-; addi r05,r05,1
-; ; Skip to END if Carriage return
-; beq r31,r03,1
-; ; Jump back to LOADTO31
-; jmp -3
-; ;END
-

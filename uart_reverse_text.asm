@@ -11,6 +11,7 @@
 #
 addi r15,r00,0
 addi r17,r00,1
+addi r07,r00,16
 addi r08,r00,0
 addi r09,r00,48
 
@@ -56,8 +57,6 @@ beq r11,r25,READUART
 nop
 nop
 nop
-nop
-nop
 addi r15,r15,1
 lb r10,r00,1
 nop
@@ -65,9 +64,17 @@ nop
 nop
 nop
 nop
-sb r10,r15,2
-beq r10,r09,GOOUTPUT
+sb r10,r00,0
 nop
+nop
+nop
+nop
+nop
+sb r10,r15,2
+;beq r10,r09,GOOUTPUT
+nop
+nop
+beq r15,r07,GOOUTPUT
 nop
 nop
 jmp READUART

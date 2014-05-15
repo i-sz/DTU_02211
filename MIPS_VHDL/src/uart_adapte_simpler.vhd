@@ -44,7 +44,7 @@ process (clk,rst)
 	  end if;
 	end process;
 	
-    uart_wr_ena <= mem_wr_ena;
+    uart_wr_ena <= mem_wr_ena when (mem_address(4 downto 0) = "00000") else '0' ;
     uart_rd_ena <= mem_rd_ena;
     uart_addr <=  "00" when (mem_address(4 downto 0) = "00010") else "01" ;  --when we write to uart
     uart_wr_data <= mem_data_in;
