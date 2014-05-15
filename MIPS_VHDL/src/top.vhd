@@ -10,7 +10,7 @@ port(
     rst : in std_logic;
     uart_tx : out std_logic;
     uart_rx : in std_logic;
-    led : out std_logic_vector(9 downto 0)  --testing purpose
+    led : out std_logic--_vector(9 downto 0)  --testing purpose
 );
 
 end top;
@@ -104,7 +104,7 @@ begin
 
 rdy_cnt_s <= std_logic_vector(rdy_cnt_s_u);
 
-led  <= rd_data_s(9 downto 0);
+--led  <= rd_data_s(9 downto 0);
 
 
   uart_inst : sc_uart port map       -- Maps internal signals to ports
