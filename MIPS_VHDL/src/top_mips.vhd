@@ -335,7 +335,7 @@ port map(
 );
 	
 	r1_data_ss <= r1_data_s when uart_rd_ena = '0' else data_in;
-	rd_ena  <= rd_mem_ma;
+	rd_ena  <= mem_rd;
     wr_ena <= mem_wr;
     addr_adapter <= alu_output_s(4 downto 0);
     data_out <= b_out_s;

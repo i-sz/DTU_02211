@@ -9,35 +9,33 @@
 #
 # Reverses text from memory point 1 to X to memory point X+1 - X+X+1
 #
-addi r15,r00,0
-addi r17,r00,1
-addi r08,r00,0
-addi r09,r00,48
 
-addi r25,r00,1
-addi r26,r00,2
-addi r27,r00,3
+addi r21,r00,1
+;End of the line sign
+;addi r03,r00,13
+; nop
+; nop
+; nop
+; nop
+; nop
+; sb r20,r00,5
+; nop
+; nop
+; nop
+; nop
+; nop
+; lb r10,r00,5
+
+;addi r05,r00,5
+
+;For minus things
+;addi r04,r00,1
+
+;Counter
+;addi r01,r00,0
 
 ;h
-addi r01,r00,104
-#r01 = H
-; sb r01,r00,0
-
-addi r02,r00,101
-#r02 = e
-; sb r02,r00,0
-
-addi r03,r00,108
-#r03 = l
-; sb r03,r00,0
-
-addi r04,r00,108
-#r04 = l
-; sb r04,r00,0
-
-addi r05,r00,111
-#r05 = o
-; sb r05,r00,0
+addi r06,r00,104
 
 ;Read loop start
 ;Read from UART
@@ -46,93 +44,26 @@ addi r20,r00,10000
 nop
 nop
 nop
-lb r11,r00,2
 nop
 nop
-nop
-nop
-nop
-beq r11,r25,READUART
-nop
-nop
-nop
-nop
-nop
-addi r15,r15,1
+lb r10,r00,1
+lb r10,r00,1
 lb r10,r00,1
 nop
 nop
 nop
 nop
 nop
-sb r10,r15,2
-beq r10,r09,GOOUTPUT
+;beq r10,r00,LOOP
 nop
 nop
-nop
-jmp READUART
-nop
-nop
-nop
-; beq r10,r01,H
-; nop
-; nop
-; beq r10,r02,E
-; nop
-; nop
-; beq r10,r03,L
-; nop
-; nop
-; beq r10,r05,O
-; nop
-; nop
-; jmp READUART
-; nop
-; nop
-; nop
-; H:
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; E:
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; L:
-; beq r08,r00,L2
-; nop
-; nop
-; nop
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; L2:
-; addi r08,r08,1
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; O:
-; addi r15,r15,1
-; sb r10,r15,2
-; addi r16,r15,0
-GOOUTPUT:
-addi r16,r15,0
+addi r20,r00,10000
 nop
 nop
 nop
 nop
 nop
-jmp OUTPUT
-nop
-nop
+jmp OLOOP
 nop
 nop
 ; nop
@@ -143,18 +74,15 @@ nop
 ; OUTPUT:
 ; addi r20,r00,10000
 OUTPUT:
-lb r10,r16,2
-sub r16,r16,r17
-addi r20,r00,10000
 nop
 nop
 nop
 sb r10,r00,0
-beq r10,r09,END
+;beq r00,r10,READUART
 nop
 nop
 nop
-jmp LOOP
+jmp READUART
 nop
 nop
 
@@ -243,7 +171,7 @@ nop
 
 
 LOOP:
-beq r20,r00,OUTPUT
+beq r20,r00,READUART
 nop
 nop
 nop
@@ -254,7 +182,7 @@ nop
 nop
 nop
 nop
-sub r20,r20,r17
+sub r20,r20,r21
 nop
 nop
 nop
@@ -269,10 +197,32 @@ jmp LOOP
 nop
 nop
 
-
 nop
 nop
-END:
+OLOOP:
+beq r20,r00,OUTPUT
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+sub r20,r20,r21
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+jmp OLOOP
 nop
 nop
 ; ;# Initialize counter
