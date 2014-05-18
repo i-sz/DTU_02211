@@ -12,6 +12,7 @@
 addi r01,r00,0
 addi r02,r00,1
 addi r03,r00,1
+addi r12,r00,0
 addi r13,r00,1
 addi r14,r00,3
 addi r15,r00,46

@@ -64,86 +64,87 @@ nop
 nop
 nop
 nop
-sb r10,r00,0
-nop
-nop
-nop
-nop
-nop
-sb r10,r15,2
-;beq r10,r09,GOOUTPUT
-nop
-nop
-beq r15,r07,GOOUTPUT
-nop
-nop
-jmp READUART
-nop
-nop
-nop
-; beq r10,r01,H
-; nop
-; nop
-; beq r10,r02,E
-; nop
-; nop
-; beq r10,r03,L
-; nop
-; nop
-; beq r10,r05,O
-; nop
-; nop
-; jmp READUART
-; nop
-; nop
-; nop
-; H:
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; E:
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; L:
-; beq r08,r00,L2
-; nop
-; nop
-; nop
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; L2:
-; addi r08,r08,1
-; addi r15,r15,1
-; sb r10,r15,2
-; jmp READUART
-; nop
-; nop
-; O:
-; addi r15,r15,1
-; sb r10,r15,2
-; addi r16,r15,0
-GOOUTPUT:
-addi r16,r15,0
-nop
-nop
-nop
-nop
-nop
 jmp OUTPUT
-nop
-nop
+; sb r10,r00,0
 nop
 nop
 ; nop
-; jmp LOOP2
+; nop
+; nop
+; sb r10,r15,2
+; ;beq r10,r09,GOOUTPUT
+; nop
+; nop
+; beq r15,r07,GOOUTPUT
+; nop
+; nop
+; jmp READUART
+; nop
+; nop
+; nop
+; ; beq r10,r01,H
+; ; nop
+; ; nop
+; ; beq r10,r02,E
+; ; nop
+; ; nop
+; ; beq r10,r03,L
+; ; nop
+; ; nop
+; ; beq r10,r05,O
+; ; nop
+; ; nop
+; ; jmp READUART
+; ; nop
+; ; nop
+; ; nop
+; ; H:
+; ; addi r15,r15,1
+; ; sb r10,r15,2
+; ; jmp READUART
+; ; nop
+; ; nop
+; ; E:
+; ; addi r15,r15,1
+; ; sb r10,r15,2
+; ; jmp READUART
+; ; nop
+; ; nop
+; ; L:
+; ; beq r08,r00,L2
+; ; nop
+; ; nop
+; ; nop
+; ; addi r15,r15,1
+; ; sb r10,r15,2
+; ; jmp READUART
+; ; nop
+; ; nop
+; ; L2:
+; ; addi r08,r08,1
+; ; addi r15,r15,1
+; ; sb r10,r15,2
+; ; jmp READUART
+; ; nop
+; ; nop
+; ; O:
+; ; addi r15,r15,1
+; ; sb r10,r15,2
+; ; addi r16,r15,0
+; GOOUTPUT:
+; addi r16,r15,0
+; nop
+; nop
+; nop
+; nop
+; nop
+; jmp OUTPUT
+; nop
+; nop
+; nop
+; nop
+; ; nop
+; ; jmp LOOP2
 ; nop
 ; nop
 ; nop
